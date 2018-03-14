@@ -4,16 +4,17 @@ def Command(*args):
 
 
 class Object():
-    def __init__(self, filename, alignment='Centre', x=320, y=240):
+    def __init__(self, file_name, alignment='Centre', x=320, y=240):
         self.type = 'Sprite'
         self.placement = 'Foreground'
         self.alignment = alignment
-        self.filename = filename
+        self.file_name = file_name
         self.x = x
         self.y = y
         self.currentLoopLevel = 1
         self.codes = []
-        # self.codes.append(','.join([self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
+        # self.codes.append(','.join(
+        # [self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
 
     def LoopOut(self):
         self.currentLoopLevel -= 1
@@ -126,26 +127,27 @@ class Object():
         if len(args) == 2:
             self.codes.append(Command(c, easing, args[0], '', args[1]))
 
-    def addT(self, condition, start_t, end_t):
+    def startTrigger(self, condition, start_t, end_t):
         spaces = ' ' * self.currentLoopLevel
         c = spaces + 'T'
         self.codes.append(Command(c, condition, start_t, end_t))
         self.currentLoopLevel += 1
 
-    def addL(self, start_t, loopcount):
+    def startLoop(self, start_t, loop_count):
         spaces = ' ' * self.currentLoopLevel
         c = spaces + 'L'
-        self.codes.append(Command(c, start_t, loopcount))
+        self.codes.append(Command(c, start_t, loop_count))
         self.currentLoopLevel += 1
 
     def add(self, s):
         self.codes.append(s)
 
-
     def printObj(self):
-        self.codes.insert(0, ','.join([self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
+        self.codes.insert(0, ','.join(
+            [self.type, self.placement, self.alignment, self.file_name, str(self.x), str(self.y)]))
         for code in self.codes:
             print(code)
+
 
 # Usage
 # Declare a new Object
@@ -155,7 +157,7 @@ Obj.addM(0, 1234, 1235, 0, 0, 320, 240)
 # addT args: condition, start_t, end_t
 # WARNING: When using addT and addL operations, looplevel will +1 by default,
 # to exit the loop, you should use LoopOut Command
-Obj.addT('Hitsound', 2000, 2018)
+Obj.startTrigger('Hitsound', 2000, 2018)
 Obj.addF(0, 0, 500, 0, 1)
 Obj.addF(0, 1000, 1500, 1, 0)
 Obj.LoopOut()
