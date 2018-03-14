@@ -143,6 +143,7 @@ class Object():
 
 
     def printObj(self):
+        self.codes.insert(0, ','.join([self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
         for code in self.codes:
             print(code)
 
