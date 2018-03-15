@@ -1,7 +1,11 @@
+from funcy import flatten
+
 def Command(*args):
     s = ','.join(str(arg) for arg in args)
     return s
 
+def Timing(start_t, end_t = None):
+    return [start_t, end_t]
 
 class Object():
     def __init__(self, file_name, alignment='Centre', x=320, y=240):
@@ -142,11 +146,53 @@ class Object():
     def add(self, s):
         self.codes.append(s)
 
+
     def printObj(self):
-        self.codes.insert(0, ','.join(
-            [self.type, self.placement, self.alignment, self.file_name, str(self.x), str(self.y)]))
+        self.codes.insert(0, ','.join([self.type, self.placement, self.alignment, self.file_name, str(self.x), str(self.y)]))
         for code in self.codes:
             print(code)
+
+class eventObj():
+    def __init__(self, key, timing, data, easing = 0):
+        self.key = key
+        self.easing = easing
+        if isinstance(timing, list):
+            self.timing = timing
+        elif isinstance(timing, dict):
+            self.timing = Timing(timing['start_t'], timing['end_t'])
+        elif isinstance(timging, tuple):
+            self.timing = list(timing)
+        else:
+            self.timing = Timing(timing)
+        self.data = data
+
+    def getList(self):
+        # return a list look like [key, easing, start_t, end_t, *data]
+        return flatten([self.key, self.easing, self.timing, self.data])
+
+class ObjectManage():
+    # unfinish
+    def __init__(self, timingOffset = 0, positionOffset = 0):
+        self.list = []
+        self.timingOffset = timingOffset
+        self.positionOffset = positionOffset
+
+    def addObject(self, *args):
+        for arg in args:
+            self.list.append(arg)
+
+    def setTimingOffset(self, ms):
+        self.timingOffset= ms
+
+    def setPositionOffset(self, vector):
+        self.positionOffset = vector
+
+    def applyChange():
+        conut = 0
+        for obj in self.list:
+            obj.timing[0] = obj.timing[0] + timingOffset
+            if obj.timing[1] != None:
+                obj.timing[1] = obj.timing[1] + timingOffset
 
 
 # Usage
@@ -165,3 +211,8 @@ Obj.addP(0, 1200, 'A')
 Obj.addC(0, 1000, 255, 255, 255)
 
 Obj.printObj()
+
+Test = eventObj(key = "F", easing = 1, timing = [1234, 12355], data = "0, 1")
+print(Test.getList())
+
+
