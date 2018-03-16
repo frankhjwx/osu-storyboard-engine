@@ -4,7 +4,8 @@ def Command(*args):
     s = ','.join(str(arg) for arg in args)
     return s
 
-def Timing(start_t, end_t = None):
+def Timing(start_t, end_t = ''):
+    "Return a list like [start_t, end_t], end_t default value is a empty."
     return [start_t, end_t]
 
 class Object():
@@ -152,31 +153,61 @@ class Object():
         for code in self.codes:
             print(code)
 
-class Code():
+class Code(Object):
     def __init__(self, key, timing, data, easing = 0):
+        "Init must take keyword, timing(If it's dict, please write like {\"start_t\": [value], \"end_t\": [value]}. If it's list, please keep two values), data. If you need, write down easing = [value] to change easing value."
         self.key = key
         self.easing = easing
         if isinstance(timing, list):
             self.timing = timing
         elif isinstance(timing, dict):
             self.timing = Timing(timing['start_t'], timing['end_t'])
-        elif isinstance(timging, tuple):
+        elif isinstance(timing, tuple):
             self.timing = list(timing)
         else:
             self.timing = Timing(timing)
         self.data = data
 
     def getList(self):
-        # return a list look like [key, easing, start_t, end_t, *data]
+        "Return a list look like [key, easing, start_t, end_t, *data]"
         return flatten([self.key, self.easing, self.timing, self.data])
 
     def getString(self):
+        "Return a string look like \' M,0,123,456,123,345 \'"
         return ','.join(map(str, self.getList()))
 
     def __str__(self):
         return self.getString()
 
     __repr__ = __str__
+
+class Move(Code):
+    # unfinish
+    def __init__(self, timing, data, easing = 0):
+        if isinstance(data, list) and len(data) % 2 == 0:
+            Code.__init__(self, 'M', timing, data, easing = easing)
+    
+class Fade(Code):
+    # unfinish
+    def __init__(self, timing, data, easing = 0):
+        if isinstance(data, list) and len(data) == 2:
+            if data[0] == data[1]:
+                Code.__init__(self, 'F', timing, data[0], easing = easing)
+            else:
+                Code.__init__(self, 'F', timing, data, easing = easing)
+
+class Scale(Code):
+    # unfinish
+    def __init__(self, timing, data, easing = 0):
+        if isinstance(data, list):
+            Code.__init__(self, 'S', timing, data, easing)
+
+
+class Rotate(Code):
+    # unfinish
+    def __init__(self, timing, data, easing = 0):
+        if isinstance(data, list):
+            Code.__init__(self, 'R', timing, data, easing = easing)
 
 class Scene():
     # unfinish
@@ -226,5 +257,8 @@ print(Test.getList())
 print(Test)
 
 print(Test.getString())
+
+m = Move(123,[123,345])
+print(m) # M,0,123,,123,345
 
 
