@@ -152,7 +152,7 @@ class Object():
         for code in self.codes:
             print(code)
 
-class eventObj():
+class Code():
     def __init__(self, key, timing, data, easing = 0):
         self.key = key
         self.easing = easing
@@ -170,7 +170,15 @@ class eventObj():
         # return a list look like [key, easing, start_t, end_t, *data]
         return flatten([self.key, self.easing, self.timing, self.data])
 
-class ObjectManage():
+    def getString(self):
+        return ','.join(map(str, self.getList()))
+
+    def __str__(self):
+        return self.getString()
+
+    __repr__ = __str__
+
+class Scene():
     # unfinish
     def __init__(self, timingOffset = 0, positionOffset = 0):
         self.list = []
@@ -212,7 +220,11 @@ Obj.addC(0, 1000, 255, 255, 255)
 
 Obj.printObj()
 
-Test = eventObj(key = "F", easing = 1, timing = [1234, 12355], data = "0, 1")
+Test = Code(key = "F", easing = 1, timing = [1234, 12355], data = "0, 1")
 print(Test.getList())
+
+print(Test)
+
+print(Test.getString())
 
 
