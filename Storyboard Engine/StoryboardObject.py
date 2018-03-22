@@ -209,6 +209,12 @@ class Rotate(Code):
         if isinstance(data, list):
             Code.__init__(self, 'R', timing, data, easing = easing)
 
+class Color(Code):
+    # unfinish
+    def __init__(self, timing, data, easing = 0):
+        if isinstance(data, list):
+            Code.__init__(self, 'C', timing, data, easing = easing)
+
 class Scene():
     # unfinish
     def __init__(self, timingOffset = 0, positionOffset = 0):
