@@ -69,7 +69,7 @@ class Object():
             print(code)
 
 
-class Code(Object):
+class Code(object):
     def arrayToList(self, l, a=None):
         a = list(a) if isinstance(a, (list, tuple)) else []
         for i in l:
