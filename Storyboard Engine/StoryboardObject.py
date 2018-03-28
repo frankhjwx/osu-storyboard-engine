@@ -32,7 +32,7 @@ class Object():
         self.type = 'Sprite'
         self.placement = 'Foreground'
         self.alignment = alignment
-        self.file_name = file_name
+        self.file_name = '\"' + file_name + '\"'
         self.x = x
         self.y = y
         self.codes = []
@@ -88,6 +88,8 @@ class Code(Object):
                 return timeParser(t)
             else:
                 raise RuntimeError('Wrong Timing Format.')
+        else:
+            return int(t)
 
     def __init__(self, key, timing, data, easing=0, loopLevel=1):
         "Init must take keyword, timing(If it's dict, please write like {\"start_t\": [value], \"end_t\": [value]}. \
@@ -253,3 +255,8 @@ m2 = Move([12, 34], [1, 2, 1, 2])
 m3 = Move(1, [123, 324, 234, 234])
 c = Color(['1:02:323', '2:53:23'], [Red, White])
 print(c)
+
+Obj = Object('star.png')
+Obj.add(Move(['0:1:2', '1:2:3'], [320, 240, 320, 360]))
+Obj.add(Fade([12345, 67890], [1, 0], easing=1))
+Obj.printObj()
