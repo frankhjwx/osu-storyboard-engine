@@ -1,10 +1,10 @@
 from funcy import flatten
 
 codeArgNum = {
-    'M': 2,  'F': 1, 'S': 1,
-    'V': 2, 'MX': 1, 'MY': 1,
-    'VX': 1, 'VY': 1, 'R': 1,
-    'C': 3, 'P': 1
+    'M' :    2, 'F'  :     1,  'S'  :    1,
+    'V' :    2, 'MX' :     1,  'MY' :    1,
+    'VX':    1, 'VY' :     1,  'R'  :    1,
+    'C' :    3, 'P'  :     1
 }
 
 def Command(*args):
@@ -19,7 +19,7 @@ def timeParser(s):
     ms = int(args[2])
     if not (0 <= 59 and 0 <= ms <= 999):
         raise RuntimeError('Wrong Timing Format.')
-    return (m*60+s)*1000+ms
+    return (m * 60 + s) * 1000 + ms
 
 
 def Timing(start_t, end_t=''):
@@ -198,12 +198,6 @@ class Color(Code):
     def __init__(self, timing, data, easing=0):
         Code.__init__(self, 'C', timing, data, easing=easing)
 
-
-class Color(Code):
-    # unfinish
-    def __init__(self, timing, data, easing = 0):
-        if isinstance(data, list):
-            Code.__init__(self, 'C', timing, data, easing = easing)
 
 class Scene():
     # unfinish
