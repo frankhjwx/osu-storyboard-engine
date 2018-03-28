@@ -39,37 +39,81 @@ class Object:
         self.y = y
         self.codes = []
         self.currentLoopLevel = 0
+        self.isLooping = False
+        self.isTriggering = False
+        self.isInnerClass = False
+        self.loop = Loop
         # self.codes.append(','.join(
         # [self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
 
     def add(self, x):
-        # if X is a Code
-        if isinstance(x, Code):
-            self.codes.append(x)
-        # if X is a list of Codes
-        if isinstance(x, list):
-            self.codes.extend(x)
+        if not self.isLooping:
+            # if X is a Code
+            if isinstance(x, Code):
+                self.codes.append(x)
+            # if X is a list of Codes
+            if isinstance(x, list):
+                self.codes.extend(x)
+        elif self.isLooping:
+            self.loop.codes.append(x)
+
+        # elif self.isTriggering:
+        #   self.trigger.codes.append(x)
 
     def start_trigger(self, condition, start_t, end_t):
-        spaces = ' ' * self.currentLoopLevel
-        c = spaces + 'T'
-        self.codes.append(command(c, condition, start_t, end_t))
+        if self.isLooping or self.isTriggering:
+            raise RuntimeError('You can not start another loop when the previous one isn\'t end.')
         self.currentLoopLevel += 1
+        # spaces = ' ' * self.currentLoopLevel
+        # c = spaces + 'T'
+        # self.codes.append(command(c, condition, start_t, end_t))
 
     def start_loop(self, start_t, loop_count):
-        spaces = ' ' * self.currentLoopLevel
-        c = spaces + 'L'
-        self.codes.append(command(c, start_t, loop_count))
+        if self.isLooping or self.isTriggering:
+            raise RuntimeError('You can not start another loop when the previous one isn\'t end.')
         self.currentLoopLevel += 1
+        self.isLooping = True
+        self.loop = Loop(start_t, loop_count)
+        # spaces = ' ' * self.currentLoopLevel
+        # c = spaces + 'L'
+        # self.codes.append(command(c, start_t, loop_count))
+
+    def end_loop(self):
+        if not self.isLooping and not self.isTriggering:
+            raise RuntimeError('You can not stop a loop when a loop isn\'t started.')
+        self.codes.append(self.loop)
+        self.isLooping = False
+        self.isTriggering = False
+        self.currentLoopLevel -= 1
 
     # def add(self, s):
     #     self.codes.append(s)
 
     def print_obj(self):
-        self.codes.insert(0, ','.join(
-            [self.type, self.placement, self.alignment, self.fileName, str(self.x), str(self.y)]))
+        ','.join([self.type, self.placement, self.alignment, self.fileName, str(self.x), str(self.y)])
+        abc = self.__str__()
+        print(','.join(
+            [self.type, self.placement, self.alignment, self.fileName, str(self.x),
+             str(self.y)]) + "\n" + abc)
+        # inner_space = ''
+        # if self.isInnerClass:
+        #    inner_space = ' '
+        # if not self.isInnerClass:
+        #    self.codes.insert(0, ','.join(
+        #        [self.type, self.placement, self.alignment, self.fileName, str(self.x), str(self.y)]))
+        # for code in self.codes:
+        #    print(inner_space + code.get_string())
+
+    def __str__(self):
+        tmp_str = ''
+        inner_space = ''
+        if self.isInnerClass:
+            inner_space = ' '
+
         for code in self.codes:
-            print(code)
+            abc = code.__str__()
+            tmp_str = tmp_str + (inner_space + abc) + '\n'
+        return tmp_str
 
 
 class Code(Object):
@@ -203,6 +247,21 @@ class Color(Code):
         Code.__init__(self, 'C', timing, data, easing=easing)
 
 
+class Loop(Object):
+    def __init__(self, start_time, loop_count):
+        self.startTime = start_time
+        self.isLooping = False
+        self.loopCount = loop_count
+        self.isInnerClass = True
+        self.codes = []
+        # self.codes.append(','.join(
+        # [self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
+
+    def __str__(self):
+        tmp_str = ' L,' + str(self.startTime) + ',' + str(self.loopCount) + '\n' + Object.__str__(self)
+        return tmp_str
+
+
 class Scene:
     # unFinish
     def __init__(self, timing_offset=0, position_offset=0):
@@ -255,13 +314,23 @@ Red = [255, 0, 0]
 White = [255, 255, 255]
 
 mov = Move(123, [123, 345])
-mov2 = Move([12, 34], [1, 2, 1, 2])
+mov2 = Move([451, 471], [310, 231, 361, 142])
 mov3 = Move(1, [123, 324, 234, 234])
 color = Color(['1:02:323', '2:53:23'], [Red, White])
-print(color)
+# print(color)
 
-Obj = Object('star.png')
-Obj.add(Move(['0:1:2', '1:2:3'], [320, 240, 320, 360]))
+obj = Object('star.png')
+obj.add(mov)
+obj.add(mov)
+obj.start_loop(12, 34)
+obj.add(mov2)
+obj.end_loop()
 
-Obj.add(Fade([12345, 67890], [1, 0], easing=1))
-Obj.print_obj()
+obj.add(color)
+obj.add(mov3)
+
+obj.start_loop(4132, 3454)
+obj.add(color)
+obj.end_loop()
+
+obj.print_obj()
