@@ -10,6 +10,7 @@ class Composition():
         self.positionOffset = None
         self.set_position_offset(position_offset)
 
+
     def add_object(self, *args):
         for arg in args:
             self.list.append(arg)
@@ -56,7 +57,7 @@ obj.Fade('00:25:400', '00:30:300', 1, 0)
 obj.Trigger('Hitsound', 30000, 40000)
 obj.Vector(0, 0, 0)
 obj.LoopOut()
-obj.Color('00:23:345', [255, 0, 0])
+obj.Color('00:23:345', [255,0,0])
 
 obj2 = copy.deepcopy(obj)
 
