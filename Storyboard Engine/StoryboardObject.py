@@ -173,5 +173,4 @@ def ObjTest():
     obj.Vector(0, 0, 0)
     obj.LoopOut()
     obj.Color('00:23:345', Red)
-    obj.remove('M')
     obj.print_obj()
