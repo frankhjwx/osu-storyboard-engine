@@ -139,6 +139,12 @@ class Object:
             self.codes.append(Trigger(args[1:3], args[0], looplevel=self.currentLoopLevel))
             self.currentLoopLevel += 1
 
+    def remove(self, key):
+        if key in codeArgNum:
+            [self.codes.remove(code) for code in self.codes if code.key == key]
+        else:
+            raise RuntimeError('Not supported Command.')
+
     def LoopOut(self):
         self.currentLoopLevel -= 1
 
@@ -167,4 +173,5 @@ def ObjTest():
     obj.Vector(0, 0, 0)
     obj.LoopOut()
     obj.Color('00:23:345', Red)
+    obj.remove('M')
     obj.print_obj()

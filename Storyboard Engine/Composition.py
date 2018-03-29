@@ -49,6 +49,7 @@ class Composition():
         for obj in self.list:
             obj.print_obj()
 
+
 obj = Object('star.png', type='Animation', frameCount=24, frameDelay=40, loopType='LoopOnce')
 obj.Move('00:23:345', 320, 240)
 obj.Rotate('00:24:560', '00:26:402', 1, 30.234)

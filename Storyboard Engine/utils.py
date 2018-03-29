@@ -1,3 +1,11 @@
+codeArgNum = {
+    'M': 2, 'F': 1, 'S': 1,
+    'V': 2, 'MX': 1, 'MY': 1,
+    'VX': 1, 'VY': 1, 'R': 1,
+    'C': 3, 'P': 1
+}
+
+
 def time_parser(s):
     args = s.split(':')
     m = int(args[0])
@@ -16,6 +24,7 @@ def command(*args):
 def get_timing(start_t, end_t=''):
     """Return a list like [start_t, end_t], end_t default value is a empty."""
     return [start_t, end_t]
+
 
 def array_to_list(l, a=None):
     a = list(a) if isinstance(a, (list, tuple)) else []
