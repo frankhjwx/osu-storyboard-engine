@@ -1,4 +1,5 @@
 from funcy import flatten
+import copy
 
 codeArgNum = {
     'M': 2, 'F': 1, 'S': 1,
@@ -38,32 +39,27 @@ class Object:
         self.x = x
         self.y = y
         self.codes = []
-        self.currentLoopLevel = 0
-        # self.codes.append(','.join(
-        # [self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
+        self.currentLoopLevel = 1
 
     def add(self, x):
         # if X is a Code
         if isinstance(x, Code):
-            self.codes.append(x)
+            code = copy.deepcopy(x)
+            self.codes.append(code)
+            code.change_loop_level(self.currentLoopLevel)
+            if code.key == 'T' or code.key == 'L':
+                self.currentLoopLevel += 1
         # if X is a list of Codes
         if isinstance(x, list):
-            self.codes.extend(x)
+            codes = x
+            self.codes.extend(codes)
+            for code in codes:
+                code.change_loop_level(self.currentLoopLevel)
+                if code.key == 'T' or code.key == 'L':
+                    self.currentLoopLevel += 1
 
-    def start_trigger(self, condition, start_t, end_t):
-        spaces = ' ' * self.currentLoopLevel
-        c = spaces + 'T'
-        self.codes.append(command(c, condition, start_t, end_t))
-        self.currentLoopLevel += 1
-
-    def start_loop(self, start_t, loop_count):
-        spaces = ' ' * self.currentLoopLevel
-        c = spaces + 'L'
-        self.codes.append(command(c, start_t, loop_count))
-        self.currentLoopLevel += 1
-
-    # def add(self, s):
-    #     self.codes.append(s)
+    def loop_out(self):
+        self.currentLoopLevel -= 1
 
     def print_obj(self):
         self.codes.insert(0, ','.join(
@@ -87,7 +83,7 @@ class Code(Object):
         if isinstance(t, str):
             ts = t.split(':')
             if len(ts) == 1:
-                return int(ts)
+                return int(ts[0])
             elif len(ts) == 3:
                 return time_parser(t)
             else:
@@ -98,6 +94,49 @@ class Code(Object):
     def __init__(self, key, timing, data, easing=0, loop_level=1):
         """Init must take keyword, timing(If it's dict, please write like {\"start_t\": [value], \"end_t\": [value]}. \
         If it's list, please keep two values), data. If you need, write down easing = [value] to change easing value."""
+        # if it's Trigger or Loop
+        if key == 'T' or key == 'L':
+            # L: L,start_t,data(loopCount)
+            # T: T,data(triggerType),start_t,end_t
+            if key == 'L':
+                self.data = int(data)
+                if isinstance(timing, tuple):
+                    timing = list(timing)
+                if isinstance(timing, list):
+                    if len(timing) == 0 or len(timing) > 1:
+                        raise RuntimeError('Not supported timing argument.')
+                    else:
+                        self.timing = get_timing(timing[0])
+                elif isinstance(timing, dict):
+                    if not ('start_t' in timing):
+                        raise RuntimeError('Not supported timing argument.')
+                    self.timing = timing['start_t']
+                else:
+                    self.timing = get_timing(timing)
+                self.timing = self.normalize_timing_format(self.timing[0])
+            if key == 'T':
+                self.data = data
+                if isinstance(timing, tuple):
+                    timing = list(timing)
+                if isinstance(timing, list):
+                    if len(timing) == 0 or len(timing) > 2:
+                        raise RuntimeError('Not supported timing argument.')
+                    if len(timing) == 1:
+                        self.timing = get_timing(timing[0])
+                    else:
+                        self.timing = get_timing(timing[0], timing[1])
+                elif isinstance(timing, dict):
+                    if not ('start_t' in timing and 'end_t' in timing):
+                        raise RuntimeError('Not supported timing argument.')
+                    self.timing = get_timing(timing['start_t'], timing['end_t'])
+                else:
+                    self.timing = get_timing(timing)
+                self.timing[0] = self.normalize_timing_format(self.timing[0])
+                if self.timing[1] != '':
+                    self.timing[1] = self.normalize_timing_format(self.timing[1])
+            self.key = key
+            self.loopLevel = loop_level
+            return
         # Do format check
         data = self.array_to_list(data)
         if key not in codeArgNum:
@@ -141,6 +180,10 @@ class Code(Object):
 
     def get_list(self):
         """Return a list look like [key, easing, start_t, end_t, *data]"""
+        if self.key == 'L':
+            return flatten([self.key, self.timing, self.data])
+        if self.key == 'T':
+            return flatten([self.key, self.data, self.timing])
         return flatten([self.key, self.easing, self.timing, self.data])
 
     def get_string(self):
@@ -155,22 +198,22 @@ class Code(Object):
 
 class Move(Code):
     def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'M', timing, data, easing=easing)
+        Code.__init__(self, 'M', timing, data, easing)
 
 
 class MoveX(Code):
     def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'MX', timing, data, easing=easing)
+        Code.__init__(self, 'MX', timing, data, easing)
 
 
 class MoveY(Code):
     def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'MY', timing, data, easing=easing)
+        Code.__init__(self, 'MY', timing, data, easing)
 
 
 class Fade(Code):
     def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'F', timing, data, easing=easing)
+        Code.__init__(self, 'F', timing, data, easing)
 
 
 class Scale(Code):
@@ -195,12 +238,22 @@ class VectorY(Code):
 
 class Rotate(Code):
     def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'R', timing, data, easing=easing)
+        Code.__init__(self, 'R', timing, data, easing)
 
 
 class Color(Code):
     def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'C', timing, data, easing=easing)
+        Code.__init__(self, 'C', timing, data, easing)
+
+
+class Loop(Code):
+    def __init__(self, timing, loopcount):
+        Code.__init__(self, 'L', timing, data=loopcount)
+
+
+class Trigger(Code):
+    def __init__(self, timing, triggerType):
+        Code.__init__(self, 'T', timing, data=triggerType)
 
 
 class Scene:
@@ -259,9 +312,26 @@ mov2 = Move([12, 34], [1, 2, 1, 2])
 mov3 = Move(1, [123, 324, 234, 234])
 color = Color(['1:02:323', '2:53:23'], [Red, White])
 print(color)
+trigger = Trigger([123, 234], 'Hitsound')
+trigger2 = Trigger([123, 345], 'HitsoundSoftClap')
+loop = Loop(123, 30)
+loop2 = Loop([234], 30)
+loop3 = Loop('599', 30)
+print(trigger)
 
-Obj = Object('star.png')
-Obj.add(Move(['0:1:2', '1:2:3'], [320, 240, 320, 360]))
+obj = Object('star.png')
+obj.add(mov)
+obj.add(mov)
+obj.add(trigger)
+obj.add(mov2)
+obj.add(trigger2)
+obj.add(mov2)
+obj.loop_out()
+obj.loop_out()
+obj.add(color)
+obj.add(mov3)
+obj.add(loop)
+obj.add(color)
+obj.loop_out()
 
-Obj.add(Fade([12345, 67890], [1, 0], easing=1))
-Obj.print_obj()
+obj.print_obj()
