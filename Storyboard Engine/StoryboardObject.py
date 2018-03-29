@@ -247,7 +247,7 @@ class Color(Code):
     def __init__(self, timing, data, easing=0):
         Code.__init__(self, 'C', timing, data, easing=easing)
 
-class Loop(Object):
+class Loop(object):
     def __init__(self, start_time, loop_count):
         self.startTime = start_time
         self.isLooping = False
@@ -265,11 +265,10 @@ class Composition():
     # unfinish
     def __init__(self, timing_offset=0, position_offset=0):
         self.list = []
-        self.set_timingOffset = timing_offset
-        if isinstance(position_offset, list):
-            self.positionOffset = position_offset
-        elif isinstance(position_offset, (int, long, float)):
-            self.positionOffset = [position_offset, position_offset]
+        self.timingOffset = timing_offset
+        self.positionOffset = None
+        self.set_position_offset(position_offset)
+
 
     def add_object(self, *args):
         for arg in args:
@@ -279,22 +278,34 @@ class Composition():
         self.timingOffset = ms
 
     def set_position_offset(self, vector):
-        self.positionOffset = vector
+        if isinstance(vector, list):
+            self.positionOffset = vector
+        elif isinstance(vector, (int, long, float)):
+            self.positionOffset = [vector, vector]
 
     def apply_change(self):
         conut = 0
         for obj in self.list:
-            obj.timing[0] = obj.timing[0] + self.timingOffset
-            if obj.timing[1] != None:
-                obj.timing[1] = obj.timing[1] + self.timingOffset
-            obj.x = obj.x + positionOffset[0]
-            obj.y = obj.y + positionOffset[1]
-
-
+            if self.positionOffset != None:
+                obj.x = obj.x + self.positionOffset[0]
+                obj.y = obj.y + self.positionOffset[1]
+            for code in obj.codes:
+                code.timing[0] = code.timing[0] + self.timingOffset
+                if code.timing[1] != None:
+                    code.timing[1] = code.timing[1] + self.timingOffset
+                if isinstance(code, Move):
+                    code.data[0] += self.positionOffset[0]
+                    code.data[1] += self.positionOffset[1]
+                    code.data[2] += self.positionOffset[0]
+                    code.data[3] += self.positionOffset[1]
 
     def clone(self):
         "Return a new same Composition Object"
         return copy.deepcopy(self)
+
+    def print_all(self):
+        for obj in self.list:
+            obj.print_obj()
 
 
 # Usage
@@ -347,3 +358,18 @@ Obj = Object('star.png')
 Obj.add(Move(['0:1:2', '1:2:3'], [320, 240, 320, 360]))
 Obj.add(Fade([12345, 67890], [1, 0], easing=1))
 Obj.print_obj()
+
+obj2 = copy.deepcopy(Obj)
+
+comp = Composition()
+comp.add_object(Obj)
+comp.add_object(obj2)
+comp.print_all()
+
+comp2 = comp.clone()
+comp2.set_timing_offset(123)
+comp2.set_position_offset(100)
+comp2.apply_change()
+comp2.print_all()
+
+
