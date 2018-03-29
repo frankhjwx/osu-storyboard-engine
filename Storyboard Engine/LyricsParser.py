@@ -26,10 +26,16 @@ class Letter():
         self.end_t = t2
 
 
+# fontPath e.g.: os.path.join("C:/Windows/Fonts", "A-OTF-GothicBBBPr5-Medium.otf")
+# fontSize e.g.: 60
+# filePath e.g.: SB/lyrics
 class CharacterRender():
-    def __init__(self):
+    def __init__(self, fontPath="C:/Windows/Fonts/A-OTF-GothicBBBPr5-Medium.otf", fontSize=60, filePath="SB/lyrics"):
         self.characters = []
         self.width = []
+        self.fontPath = fontPath
+        self.fontSize = fontSize
+        self.filePath = filePath
 
     def setCh(self, letter):
         if letter.character not in self.characters:
@@ -46,7 +52,7 @@ class CharacterRender():
 
     def chRender(self):
         pygame.init()
-        font = pygame.font.Font(os.path.join("C:/Windows/Fonts", "A-OTF-GothicBBBPr5-Medium.otf"), 60)
+        font = pygame.font.Font(self.fontPath, self.fontSize)
         for character in self.characters:
             rtext = font.render(character, True, (255, 255, 255))
             if self.characters.index(character)%10 == 0:
@@ -54,7 +60,7 @@ class CharacterRender():
             else:
                 name = str(self.characters.index(character))
             self.width.append(rtext.get_size()[0])
-            pygame.image.save(rtext, "test/"+name+".png")
+            pygame.image.save(rtext, os.path.join(self.filePath, name+".png"))
 
 class Sentence():
     def __init__(self):
