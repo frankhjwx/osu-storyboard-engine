@@ -144,12 +144,13 @@ class Object:
 
     def print_obj(self):
         if self.type == 'Sprite':
-            self.codes.insert(0, ','.join(
-                [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y)]))
+            objHeader = ','.join(
+                [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y)])
         else:
-            self.codes.insert(0, ','.join(
+            objHeader = ','.join(
                 [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y),
-                 str(self.frameCount), str(self.frameDelay), str(self.loopType)]))
+                 str(self.frameCount), str(self.frameDelay), str(self.loopType)])
+        print(objHeader)
         for code in self.codes:
             print(code)
 
@@ -167,5 +168,3 @@ def ObjTest():
     obj.LoopOut()
     obj.Color('00:23:345', Red)
     obj.print_obj()
-
-ObjTest()
