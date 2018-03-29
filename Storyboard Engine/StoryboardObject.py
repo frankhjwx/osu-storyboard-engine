@@ -6,14 +6,23 @@ from StoryboardCode import *
 
 # Old Class, will be modified later
 class Object:
-    def __init__(self, file_name, alignment='Centre', x=320, y=240):
-        self.type = 'Sprite'
-        self.placement = 'Foreground'
-        self.alignment = alignment
+    def __init__(self, file_name, type='Sprite', origin='Centre', x=320, y=240,
+                 frameCount=0, frameDelay=0, loopType=''):
+        if not (type == 'Sprite' or type == 'Animation'):
+            raise RuntimeError('No type supported for this kind of Object!')
+        self.type = type
+        self.layer = 'Foreground'
+        self.origin = origin
         self.fileName = '\"' + file_name + '\"'
         self.x = x
         self.y = y
         self.codes = []
+        self.frameCount = frameCount
+        self.frameDelay = frameDelay
+        if type == 'Animation':
+            if not (loopType == 'LoopForever' or loopType == 'LoopOnce'):
+                raise RuntimeError('Not supported LoopType for animation.')
+        self.loopType = loopType
         self.currentLoopLevel = 1
 
     def add(self, x):
@@ -37,8 +46,13 @@ class Object:
         self.currentLoopLevel -= 1
 
     def print_obj(self):
-        self.codes.insert(0, ','.join(
-            [self.type, self.placement, self.alignment, self.fileName, str(self.x), str(self.y)]))
+        if self.type == 'Sprite':
+            self.codes.insert(0, ','.join(
+                [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y)]))
+        else:
+            self.codes.insert(0, ','.join(
+                [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y),
+                 str(self.frameCount), str(self.frameDelay), str(self.loopType)]))
         for code in self.codes:
             print(code)
 
@@ -59,7 +73,7 @@ def ObjTest():
     loop3 = Loop('599', 30)
     print(trigger)
 
-    obj = Object('star.png')
+    obj = Object('star.png', type='Animation', frameCount=24, frameDelay=40, loopType='LoopOnce')
     obj.add(mov)
     obj.add(mov)
     obj.add(trigger)
