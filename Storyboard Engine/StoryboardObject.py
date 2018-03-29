@@ -8,12 +8,13 @@ codeArgNum = {
     'C' :    3, 'P'  :     1
 }
 
-def Command(*args):
+
+def command(*args):
     s = ','.join(str(arg) for arg in args)
     return s
 
 
-def timeParser(s):
+def time_parser(s):
     args = s.split(':')
     m = int(args[0])
     s = int(args[1])
@@ -23,80 +24,127 @@ def timeParser(s):
     return (m * 60 + s) * 1000 + ms
 
 
-def Timing(start_t, end_t=''):
-    "Return a list like [start_t, end_t], end_t default value is a empty."
+def get_timing(start_t, end_t=''):
+    """Return a list like [start_t, end_t], end_t default value is a empty."""
     return [start_t, end_t]
 
+
 # Old Class, will be modified later
-class Object():
+class Object:
     def __init__(self, file_name, alignment='Centre', x=320, y=240):
         self.type = 'Sprite'
         self.placement = 'Foreground'
         self.alignment = alignment
-        self.file_name = '\"' + file_name + '\"'
+        self.fileName = '\"' + file_name + '\"'
         self.x = x
         self.y = y
         self.codes = []
+        self.currentLoopLevel = 0
+        self.isLooping = False
+        self.isTriggering = False
+        self.isInnerClass = False
+        self.loop = Loop
         # self.codes.append(','.join(
         # [self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
 
+    def add(self, x):
+        if not self.isLooping:
+            # if X is a Code
+            if isinstance(x, Code):
+                self.codes.append(x)
+            # if X is a list of Codes
+            if isinstance(x, list):
+                self.codes.extend(x)
+        elif self.isLooping:
+            self.loop.codes.append(x)
 
-    def add(self, X):
-        # if X is a Code
-        if isinstance(X, Code):
-            self.codes.append(X)
-        # if X is a list of Codes
-        if isinstance(X, list):
-            self.codes.extend(X)
+        # elif self.isTriggering:
+        #   self.trigger.codes.append(x)
 
-    def startTrigger(self, condition, start_t, end_t):
-        spaces = ' ' * self.currentLoopLevel
-        c = spaces + 'T'
-        self.codes.append(Command(c, condition, start_t, end_t))
+    def start_trigger(self, condition, start_t, end_t):
+        if self.isLooping or self.isTriggering:
+            raise RuntimeError('You can not start another loop when the previous one isn\'t end.')
         self.currentLoopLevel += 1
+        # spaces = ' ' * self.currentLoopLevel
+        # c = spaces + 'T'
+        # self.codes.append(command(c, condition, start_t, end_t))
 
-    def startLoop(self, start_t, loop_count):
-        spaces = ' ' * self.currentLoopLevel
-        c = spaces + 'L'
-        self.codes.append(Command(c, start_t, loop_count))
+    def start_loop(self, start_t, loop_count):
+        if self.isLooping or self.isTriggering:
+            raise RuntimeError('You can not start another loop when the previous one isn\'t end.')
         self.currentLoopLevel += 1
+        self.isLooping = True
+        self.loop = Loop(start_t, loop_count)
+        # spaces = ' ' * self.currentLoopLevel
+        # c = spaces + 'L'
+        # self.codes.append(command(c, start_t, loop_count))
+
+    def end_loop(self):
+        if not self.isLooping and not self.isTriggering:
+            raise RuntimeError('You can not stop a loop when a loop isn\'t started.')
+        self.codes.append(self.loop)
+        self.isLooping = False
+        self.isTriggering = False
+        self.currentLoopLevel -= 1
 
     # def add(self, s):
     #     self.codes.append(s)
 
-    def printObj(self):
-        self.codes.insert(0, ','.join([self.type, self.placement, self.alignment, self.file_name, str(self.x), str(self.y)]))
+    def print_obj(self):
+        ','.join([self.type, self.placement, self.alignment, self.fileName, str(self.x), str(self.y)])
+        abc = self.__str__()
+        print(','.join(
+            [self.type, self.placement, self.alignment, self.fileName, str(self.x),
+             str(self.y)]) + "\n" + abc)
+        # inner_space = ''
+        # if self.isInnerClass:
+        #    inner_space = ' '
+        # if not self.isInnerClass:
+        #    self.codes.insert(0, ','.join(
+        #        [self.type, self.placement, self.alignment, self.fileName, str(self.x), str(self.y)]))
+        # for code in self.codes:
+        #    print(inner_space + code.get_string())
+
+    def __str__(self):
+        tmp_str = ''
+        inner_space = ''
+        if self.isInnerClass:
+            inner_space = ' '
+
         for code in self.codes:
-            print(code)
+            abc = code.__str__()
+            tmp_str = tmp_str + (inner_space + abc) + '\n'
+        return tmp_str
 
 
 class Code(object):
-    def arrayToList(self, l, a=None):
+    def array_to_list(self, l, a=None):
         a = list(a) if isinstance(a, (list, tuple)) else []
         for i in l:
             if isinstance(i, (list, tuple)):
-                a = self.arrayToList(i, a)
+                a = self.array_to_list(i, a)
             else:
                 a.append(i)
         return a
 
-    def normalizeTimingFormat(self, t):
+    @staticmethod
+    def normalize_timing_format(t):
         if isinstance(t, str):
             ts = t.split(':')
             if len(ts) == 1:
                 return int(ts)
             elif len(ts) == 3:
-                return timeParser(t)
+                return time_parser(t)
             else:
                 raise RuntimeError('Wrong Timing Format.')
         else:
             return int(t)
 
-    def __init__(self, key, timing, data, easing=0, loopLevel=1):
-        "Init must take keyword, timing(If it's dict, please write like {\"start_t\": [value], \"end_t\": [value]}. \
-        If it's list, please keep two values), data. If you need, write down easing = [value] to change easing value."
+    def __init__(self, key, timing, data, easing=0, loop_level=1):
+        """Init must take keyword, timing(If it's dict, please write like {\"start_t\": [value], \"end_t\": [value]}. \
+        If it's list, please keep two values), data. If you need, write down easing = [value] to change easing value."""
         # Do format check
-        data = self.arrayToList(data)
+        data = self.array_to_list(data)
         if key not in codeArgNum:
             raise RuntimeError(key + 'command is not supported in this system!')
         if not (isinstance(easing, int) and 0 <= easing <= 34):
@@ -110,20 +158,20 @@ class Code(object):
             if len(timing) == 0 or len(timing) > 2:
                 raise RuntimeError('Not supported timing argument.')
             if len(timing) == 1:
-                self.timing = Timing(timing[0])
+                self.timing = get_timing(timing[0])
             else:
-                self.timing = Timing(timing[0], timing[1])
+                self.timing = get_timing(timing[0], timing[1])
         elif isinstance(timing, dict):
             if not ('start_t' in timing and 'end_t' in timing):
                 raise RuntimeError('Not supported timing argument.')
-            self.timing = Timing(timing['start_t'], timing['end_t'])
+            self.timing = get_timing(timing['start_t'], timing['end_t'])
         else:
-            self.timing = Timing(timing)
-        self.timing[0] = self.normalizeTimingFormat(self.timing[0])
-        if self.timing[1]!= '':
-            self.timing[1] = self.normalizeTimingFormat(self.timing[1])
+            self.timing = get_timing(timing)
+        self.timing[0] = self.normalize_timing_format(self.timing[0])
+        if self.timing[1] != '':
+            self.timing[1] = self.normalize_timing_format(self.timing[1])
         if len(data) % codeArgNum[self.key] == 0:
-            if len(data)/codeArgNum[self.key] == 2:
+            if len(data) / codeArgNum[self.key] == 2:
                 data1 = data[:codeArgNum[self.key]]
                 data2 = data[codeArgNum[self.key]:]
                 if data1 == data2:
@@ -131,21 +179,21 @@ class Code(object):
             self.data = data
         else:
             raise RuntimeError('Command data set wrongly, please recheck your code.')
-        self.loopLevel = loopLevel
+        self.loopLevel = loop_level
 
-    def changeLoopLevel(self, loopLevel):
-        self.loopLevel = loopLevel
+    def change_loop_level(self, loop_level):
+        self.loopLevel = loop_level
 
-    def getList(self):
-        "Return a list look like [key, easing, start_t, end_t, *data]"
-        return flatten([ self.key, self.easing, self.timing, self.data])
+    def get_list(self):
+        """Return a list look like [key, easing, start_t, end_t, *data]"""
+        return flatten([self.key, self.easing, self.timing, self.data])
 
-    def getString(self):
-        "Return a string look like \' M,0,123,456,123,345 \'"
-        return self.loopLevel*' ' + ','.join(map(str, self.getList()))
+    def get_string(self):
+        """Return a string look like \' M,0,123,456,123,345 \'"""
+        return self.loopLevel * ' ' + ','.join(map(str, self.get_list()))
 
     def __str__(self):
-        return self.getString()
+        return self.get_string()
 
     __repr__ = __str__
 
@@ -199,28 +247,41 @@ class Color(Code):
     def __init__(self, timing, data, easing=0):
         Code.__init__(self, 'C', timing, data, easing=easing)
 
+class Loop(Object):
+    def __init__(self, start_time, loop_count):
+        self.startTime = start_time
+        self.isLooping = False
+        self.loopCount = loop_count
+        self.isInnerClass = True
+        self.codes = []
+        # self.codes.append(','.join(
+        # [self.type, self.placement, self.alignment, self.filename, str(self.x), str(self.y)]))
+
+    def __str__(self):
+        tmp_str = ' L,' + str(self.startTime) + ',' + str(self.loopCount) + '\n' + Object.__str__(self)
+        return tmp_str
 
 class Composition():
     # unfinish
-    def __init__(self, timingOffset=0, positionOffset=0):
+    def __init__(self, timing_offset=0, position_offset=0):
         self.list = []
-        self.timingOffset = timingOffset
-        if isinstance(positionOffset, list):
-            self.positionOffset = positionOffset
-        elif isinstance(positionOffset, (int, long, float)):
-            self.positionOffset = [positionOffset, positionOffset]
+        self.set_timingOffset = timing_offset
+        if isinstance(position_offset, list):
+            self.positionOffset = position_offset
+        elif isinstance(position_offset, (int, long, float)):
+            self.positionOffset = [position_offset, position_offset]
 
-    def addObject(self, *args):
+    def add_object(self, *args):
         for arg in args:
             self.list.append(arg)
 
-    def setTimingOffset(self, ms):
-        self.timingOffset= ms
+    def set_timing_offset(self, ms):
+        self.timingOffset = ms
 
-    def setPositionOffset(self, vector):
+    def set_position_offset(self, vector):
         self.positionOffset = vector
 
-    def applyChange(self):
+    def apply_change(self):
         conut = 0
         for obj in self.list:
             obj.timing[0] = obj.timing[0] + self.timingOffset
@@ -244,7 +305,7 @@ class Composition():
 # # addT args: condition, start_t, end_t
 # # WARNING: When using addT and addL operations, looplevel will +1 by default,
 # # to exit the loop, you should use LoopOut Command
-# Obj.startTrigger('Hitsound', 2000, 2018)
+# Obj.startTrigger('HitSound', 2000, 2018)
 # Obj.addF(0, 0, 500, 0, 1)
 # Obj.addF(0, 1000, 1500, 1, 0)
 # Obj.LoopOut()
@@ -252,7 +313,7 @@ class Composition():
 # Obj.addC(0, 1000, 255, 255, 255)
 
 
-#Obj.printObj()
+# Obj.printObj()
 
 # Test = Code(key="F", easing=1, timing=[1234, 12355], data="0, 1")
 # print(Test.getList())
@@ -262,13 +323,27 @@ class Composition():
 Red = [255, 0, 0]
 White = [255, 255, 255]
 
-m = Move(123, [123, 345])
-m2 = Move([12, 34], [1, 2, 1, 2])
-m3 = Move(1, [123, 324, 234, 234])
-c = Color(['1:02:323', '2:53:23'], [Red, White])
-print(c)
+mov = Move(123, [123, 345])
+mov2 = Move([451, 471], [310, 231, 361, 142])
+mov3 = Move(1, [123, 324, 234, 234])
+color = Color(['1:02:323', '2:53:23'], [Red, White])
+# print(color)
+
+obj = Object('star.png')
+obj.add(mov)
+obj.add(mov)
+obj.start_loop(12, 34)
+obj.add(mov2)
+obj.end_loop()
+
+obj.add(color)
+obj.add(mov3)
+
+obj.start_loop(4132, 3454)
+obj.add(color)
+obj.end_loop()
 
 Obj = Object('star.png')
 Obj.add(Move(['0:1:2', '1:2:3'], [320, 240, 320, 360]))
 Obj.add(Fade([12345, 67890], [1, 0], easing=1))
-Obj.printObj()
+Obj.print_obj()
