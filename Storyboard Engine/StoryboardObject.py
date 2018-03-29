@@ -152,9 +152,7 @@ class Object:
                  str(self.frameCount), str(self.frameDelay), str(self.loopType)])
         print(objHeader)
         for code in self.codes:
-            abc = code.__str__()
-            tmp_str = tmp_str + (inner_space + abc) + '\n'
-        return tmp_str
+            print(code)
 
 
 def ObjTest():
