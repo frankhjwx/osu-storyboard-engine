@@ -34,7 +34,7 @@ class Code:
         else:
             return int(t)
 
-    def __init__(self, key, timing, data, easing=0, loop_level=1):
+    def __init__(self, key, timing, data, easing=0, looplevel=0):
         """Init must take keyword, timing(If it's dict, please write like {\"start_t\": [value], \"end_t\": [value]}. \
         If it's list, please keep two values), data. If you need, write down easing = [value] to change easing value."""
         # if it's Trigger or Loop
@@ -78,7 +78,7 @@ class Code:
                 if self.timing[1] != '':
                     self.timing[1] = self.normalize_timing_format(self.timing[1])
             self.key = key
-            self.loopLevel = loop_level
+            self.loopLevel = looplevel
             return
         # Do format check
         data = self.array_to_list(data)
@@ -116,10 +116,10 @@ class Code:
             self.data = data
         else:
             raise RuntimeError('Command data set wrongly, please recheck your code.')
-        self.loopLevel = loop_level
+        self.loopLevel = looplevel
 
-    def set_loop_level(self, loop_level):
-        self.loopLevel = loop_level
+    def set_looplevel(self, looplevel):
+        self.loopLevel = looplevel
 
     def get_list(self):
         """Return a list look like [key, easing, start_t, end_t, *data]"""
@@ -131,7 +131,7 @@ class Code:
 
     def get_string(self):
         """Return a string look like \' M,0,123,456,123,345 \'"""
-        return self.loopLevel * ' ' + ','.join(map(str, self.get_list()))
+        return (self.loopLevel+1) * ' ' + ','.join(map(str, self.get_list()))
 
     def __str__(self):
         return self.get_string()
@@ -140,60 +140,65 @@ class Code:
 
 
 class Move(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'M', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'M', timing, data, easing, looplevel)
 
 
 class MoveX(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'MX', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'MX', timing, data, easing, looplevel)
 
 
 class MoveY(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'MY', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'MY', timing, data, easing, looplevel)
 
 
 class Fade(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'F', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'F', timing, data, easing, looplevel)
 
 
 class Scale(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'S', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'S', timing, data, easing, looplevel)
 
 
 class Vector(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'V', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'V', timing, data, easing, looplevel)
 
 
 class VectorX(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'VX', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'VX', timing, data, easing, looplevel)
 
 
 class VectorY(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'VY', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'VY', timing, data, easing, looplevel)
 
 
 class Rotate(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'R', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'R', timing, data, easing, looplevel)
 
 
 class Color(Code):
-    def __init__(self, timing, data, easing=0):
-        Code.__init__(self, 'C', timing, data, easing)
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'C', timing, data, easing, looplevel)
 
 
 class Loop(Code):
-    def __init__(self, timing, loopcount):
-        Code.__init__(self, 'L', timing, data=loopcount)
+    def __init__(self, timing, loopcount, looplevel=0):
+        Code.__init__(self, 'L', timing, data=loopcount, looplevel=looplevel)
 
 
 class Trigger(Code):
-    def __init__(self, timing, triggerType):
-        Code.__init__(self, 'T', timing, data=triggerType)
+    def __init__(self, timing, triggerType, looplevel=0):
+        Code.__init__(self, 'T', timing, data=triggerType, looplevel=looplevel)
+
+
+class Parameter(Code):
+    def __init__(self, timing, data, easing=0, looplevel=0):
+        Code.__init__(self, 'P', timing, data, easing, looplevel)

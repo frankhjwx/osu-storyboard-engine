@@ -16,3 +16,12 @@ def command(*args):
 def get_timing(start_t, end_t=''):
     """Return a list like [start_t, end_t], end_t default value is a empty."""
     return [start_t, end_t]
+
+def array_to_list(l, a=None):
+    a = list(a) if isinstance(a, (list, tuple)) else []
+    for i in l:
+        if isinstance(i, (list, tuple)):
+            a = array_to_list(i, a)
+        else:
+            a.append(i)
+    return a
