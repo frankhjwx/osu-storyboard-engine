@@ -158,20 +158,9 @@ def ObjTest():
     Red = [255, 0, 0]
     White = [255, 255, 255]
 
-    mov = Move(123, [123, 345])
-    mov2 = Move([12, 34], [1, 2, 1, 2])
-    mov3 = Move(1, [123, 324, 234, 234])
-    color = Color(['1:02:323', '2:53:23'], [Red, White])
-    print(color)
-    trigger = Trigger([123, 234], 'Hitsound')
-    trigger2 = Trigger([123, 345], 'HitsoundSoftClap')
-    loop = Loop(123, 30)
-    loop2 = Loop([234], 30)
-    loop3 = Loop('599', 30)
-    print(trigger)
-
     obj = Object('star.png', type='Animation', frameCount=24, frameDelay=40, loopType='LoopOnce')
     obj.Move('00:23:345', 320, 240)
+    obj.Rotate('00:24:560', '00:26:402', 1, 30.234)
     obj.Fade('00:25:400', '00:30:300', 1, 0)
     obj.Trigger('Hitsound', 30000, 40000)
     obj.Vector(0, 0, 0)
