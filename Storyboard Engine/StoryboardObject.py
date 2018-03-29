@@ -1,4 +1,5 @@
 from funcy import flatten
+import copy
 
 codeArgNum = {
     'M' :    2, 'F'  :     1,  'S'  :    1,
@@ -199,12 +200,15 @@ class Color(Code):
         Code.__init__(self, 'C', timing, data, easing=easing)
 
 
-class Scene():
+class Composition():
     # unfinish
     def __init__(self, timingOffset=0, positionOffset=0):
         self.list = []
         self.timingOffset = timingOffset
-        self.positionOffset = positionOffset
+        if isinstance(positionOffset, list):
+            self.positionOffset = positionOffset
+        elif isinstance(positionOffset, (int, long, float)):
+            self.positionOffset = [positionOffset, positionOffset]
 
     def addObject(self, *args):
         for arg in args:
@@ -222,6 +226,14 @@ class Scene():
             obj.timing[0] = obj.timing[0] + self.timingOffset
             if obj.timing[1] != None:
                 obj.timing[1] = obj.timing[1] + self.timingOffset
+            obj.x = obj.x + positionOffset[0]
+            obj.y = obj.y + positionOffset[1]
+
+
+
+    def clone(self):
+        "Return a new same Composition Object"
+        return copy.deepcopy(self)
 
 
 # Usage
