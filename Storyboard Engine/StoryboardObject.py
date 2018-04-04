@@ -213,6 +213,12 @@ class Object:
         else:
             raise RuntimeError('Not in any loop!')
 
+    def Remove(self, key):
+        if key in codeArgNum:
+            [self.codes.remove(code) for code in self.codes if code.key == key]
+        else:
+            raise RuntimeError('Not supported Command.')
+
     def printObject(self):
         if self.type == 'Sprite':
             objHeader = ','.join(
