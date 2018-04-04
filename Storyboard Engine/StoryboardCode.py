@@ -2,6 +2,13 @@ from funcy import flatten
 import copy
 from utils import *
 
+codeArgNum = {
+    'M': 2, 'F': 1, 'S': 1,
+    'V': 2, 'MX': 1, 'MY': 1,
+    'VX': 1, 'VY': 1, 'R': 1,
+    'C': 3, 'P': 1
+}
+
 class Code:
     def array_to_list(self, l, a=None):
         a = list(a) if isinstance(a, (list, tuple)) else []
