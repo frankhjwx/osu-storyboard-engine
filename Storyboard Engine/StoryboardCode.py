@@ -1,7 +1,6 @@
 from funcy import flatten
 import copy
-from utils import time_parser
-from utils import get_timing
+from utils import *
 
 codeArgNum = {
     'M': 2, 'F': 1, 'S': 1,
@@ -9,7 +8,6 @@ codeArgNum = {
     'VX': 1, 'VY': 1, 'R': 1,
     'C': 3, 'P': 1
 }
-
 
 class Code:
     def array_to_list(self, l, a=None):
