@@ -219,7 +219,7 @@ class Object:
         else:
             raise RuntimeError('Not supported Command.')
 
-    def printObject(self):
+    def printObject(self, fileHeader=None):
         if self.type == 'Sprite':
             objHeader = ','.join(
                 [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y)])
@@ -227,9 +227,14 @@ class Object:
             objHeader = ','.join(
                 [self.type, self.layer, self.origin, self.fileName, str(self.x), str(self.y),
                  str(self.frameCount), str(self.frameDelay), str(self.loopType)])
-        print(objHeader)
-        for code in self.codes:
-            print(code)
+        if fileHeader == None:
+            print(objHeader)
+            for code in self.codes:
+                print(code)
+        else:
+            fileHeader.write(objHeader+'\n')
+            for code in self.codes:
+                fileHeader.write(code.get_string()+'\n')
 
 
 def ObjTest():

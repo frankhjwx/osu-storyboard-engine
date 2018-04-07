@@ -70,6 +70,6 @@ class Scene:
         for obj in self.objects:
             obj.LoopOut()
 
-    def printScene(self):
+    def printScene(self, fileHeader = None):
         for obj in self.objects:
-            obj.printObject()
+            obj.printObject(fileHeader)
