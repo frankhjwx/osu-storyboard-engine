@@ -1,15 +1,13 @@
 from funcy import flatten
 import copy
-from utils import time_parser
-from utils import get_timing
+from utils import *
 
-codeArgNum = {
+code_arg_num = {
     'M': 2, 'F': 1, 'S': 1,
     'V': 2, 'MX': 1, 'MY': 1,
     'VX': 1, 'VY': 1, 'R': 1,
     'C': 3, 'P': 1
 }
-
 
 class Code:
     def array_to_list(self, l, a=None):
@@ -82,7 +80,7 @@ class Code:
             return
         # Do format check
         data = self.array_to_list(data)
-        if key not in codeArgNum:
+        if key not in code_arg_num:
             raise RuntimeError(key + 'command is not supported in this system!')
         if not (isinstance(easing, int) and 0 <= easing <= 34):
             raise RuntimeError('Easing wrongly set.')
@@ -107,10 +105,10 @@ class Code:
         self.timing[0] = self.normalize_timing_format(self.timing[0])
         if self.timing[1] != '':
             self.timing[1] = self.normalize_timing_format(self.timing[1])
-        if len(data) % codeArgNum[self.key] == 0:
-            if len(data) / codeArgNum[self.key] == 2:
-                data1 = data[:codeArgNum[self.key]]
-                data2 = data[codeArgNum[self.key]:]
+        if len(data) % code_arg_num[self.key] == 0:
+            if len(data) / code_arg_num[self.key] == 2:
+                data1 = data[:code_arg_num[self.key]]
+                data2 = data[code_arg_num[self.key]:]
                 if data1 == data2:
                     data = data1
             self.data = data
