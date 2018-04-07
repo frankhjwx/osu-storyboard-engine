@@ -2,15 +2,8 @@
 import os,shutil
 import pygame
 
-class Letter():
-    def __init__(self):
-        self.character = ''
-        self.id = 0
-        self.start_t = 0
-        self.end_t = 0
-        self.width = 0
-        self.filename = ''
 
+class Letter():
     def __init__(self, ch, i, t1, t2):
         self.character = ch
         self.id = i
@@ -19,61 +12,62 @@ class Letter():
         self.width = 0
         self.filename = ''
 
-    def set(self, ch, i, t1, t2):
-        self.character = ch
-        self.id = i
-        self.start_t = t1
-        self.end_t = t2
-
 
 # fontPath e.g.: os.path.join("C:/Windows/Fonts", "A-OTF-GothicBBBPr5-Medium.otf")
 # fontSize e.g.: 60
 # filePath e.g.: SB/lyrics
-class CharacterRender():
+class CharacterRenderer():
     def __init__(self, fontPath="C:/Windows/Fonts/A-OTF-GothicBBBPr5-Medium.otf", fontSize=60, filePath="SB/lyrics"):
         self.characters = []
         self.width = []
         self.fontPath = fontPath
         self.fontSize = fontSize
         self.filePath = filePath
+        pygame.init()
+        self.font = pygame.font.Font(self.fontPath, self.fontSize)
+        isExists = os.path.exists(self.filePath)
+        if not isExists:
+            os.makedirs(self.filePath)
 
     def setCh(self, letter):
         if letter.character not in self.characters:
             self.characters.append(letter.character)
+            self.chRender(len(self.characters)-1)
+            letter.width = self.width[len(self.characters)-1]
+            letter.filename = self.IDtoFilename(len(self.characters)-1)
         letter.id = self.characters.index(letter.character)
+        letter.width = self.width[len(self.characters) - 1]
+        letter.filename = self.IDtoFilename(len(self.characters) - 1)
         return
 
     def IDtoFilename(self, id):
         if id % 10 == 0:
-            name = 'SB/lyrics/' + str(int(id/10)) + 'x.png'
+            name = self.filePath + str(int(id/10)) + 'x.png'
         else:
-            name = 'SB/lyrics/' + str(id) + '.png'
+            name = self.filePath + str(id) + '.png'
         return '"'+name+'"'
 
-    def chRender(self):
-        pygame.init()
-        font = pygame.font.Font(self.fontPath, self.fontSize)
-        for character in self.characters:
-            rtext = font.render(character, True, (255, 255, 255))
-            if self.characters.index(character)%10 == 0:
-                name = str(int(self.characters.index(character)/10))+'x'
-            else:
-                name = str(self.characters.index(character))
-            self.width.append(rtext.get_size()[0])
-            pygame.image.save(rtext, os.path.join(self.filePath, name+".png"))
+    def chRender(self, index):
+        character = self.characters[index]
+        rtext = self.font.render(character, True, (255, 255, 255))
+        if self.characters.index(character)%10 == 0:
+            name = str(int(self.characters.index(character)/10))+'x'
+        else:
+            name = str(self.characters.index(character))
+        self.width.append(rtext.get_size()[0])
+        pygame.image.save(rtext, os.path.join(self.filePath, name+".png"))
 
 class Sentence():
-    def __init__(self):
+    def __init__(self, s='', t1=0, t2=0, CharacterRenderer=None):
         self.letters = []
-        self.s = ''
-        self.start_t = 0
-        self.end_t = 0
-
-    def __init__(self, t1, t2):
-        self.letters = []
-        self.s = ''
+        self.s = s
         self.start_t = t1
         self.end_t = t2
+        if s != '':
+            for ch in s:
+                letter = Letter(ch, 0, t1, t2)
+                CharacterRenderer.setCh(letter)
+                self.letters.append(letter)
 
     def settime(self, t1, t2):
         self.start_t = t1
@@ -83,9 +77,10 @@ class Sentence():
         self.letters.append(letter)
 
 
-class LP():
-    def __init__(self):
+class LyricParser():
+    def __init__(self, CharacterRenderer):
         self.sentences = []
+        self.CR = CharacterRenderer
 
     def timingParser(self, time):
         elements = time.split(':')
@@ -99,7 +94,6 @@ class LP():
         if '.ass' not in filename:
             raise RuntimeError("Incorrect ass file!")
         file = open(filename, encoding='utf8', errors='ignore')
-        CR = CharacterRender()
         for line in file:
             if 'Dialogue:' in line:
                 if '{\\k' not in line:
@@ -107,7 +101,7 @@ class LP():
                 args = line.split(',')
                 t1 = self.timingParser(args[1])
                 t2 = self.timingParser(args[2])
-                currentS = Sentence(t1, t2)
+                currentS = Sentence('', t1, t2)
                 characters = args[9].split('{\\k')
                 currentT = t1
                 for character in characters:
@@ -119,16 +113,14 @@ class LP():
                         if ch == '\n':
                             continue
                         letter = Letter(ch, 0, currentT, currentT2)
-                        CR.setCh(letter)
+                        self.CR.setCh(letter)
                         currentS.append(letter)
                         currentS.s += ch
                     currentT = currentT2
                 self.sentences.append(currentS)
-        CR.chRender()
-        for sentence in self.sentences:
-            for letter in sentence.letters:
-                letter.width = CR.width[letter.id]
-                letter.filename = CR.IDtoFilename(letter.id)
+
+    def get_sentences(self):
+        return self.sentences
 
     def ParseTest(self):
         i = 0
@@ -138,3 +130,14 @@ class LP():
             for letter in sentence.letters:
                 print(' ', letter.character, letter.start_t, letter.end_t, letter.id, letter.width)
 
+
+if __name__ == '__main__':
+    # Create a characterRenderer first
+    # Then create lyricParser, or directly add sentences
+    CR = CharacterRenderer()
+    LP = LyricParser(CR)
+    LP.AssReader(os.path.join('H:\python-workspace\oriental blossom','subtitles.ass'))
+    sentences = LP.get_sentences()
+    sentences.append(Sentence('麻花牛逼', 500, 1000, CR))
+    for sen in sentences:
+        print(sen.s, sen.start_t, sen.end_t)
