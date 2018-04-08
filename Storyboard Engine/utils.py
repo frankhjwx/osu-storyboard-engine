@@ -1,3 +1,6 @@
+import shutil
+
+
 def time_parser(s):
     args = s.split(':')
     m = int(args[0])
@@ -17,6 +20,7 @@ def get_timing(start_t, end_t=''):
     """Return a list like [start_t, end_t], end_t default value is a empty."""
     return [start_t, end_t]
 
+
 def array_to_list(l, a=None):
     a = list(a) if isinstance(a, (list, tuple)) else []
     for i in l:
@@ -25,3 +29,11 @@ def array_to_list(l, a=None):
         else:
             a.append(i)
     return a
+
+
+def copy_file(src_name, dst_name):
+    try:
+        shutil.copy(src_name, dst_name)
+    except shutil.SameFileError:
+        pass
+    return

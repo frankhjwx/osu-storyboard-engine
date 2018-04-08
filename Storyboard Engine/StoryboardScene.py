@@ -12,7 +12,12 @@ class Scene:
             self.objects = args[0]
     
     def append(self, obj):
-        self.objects.append(obj)
+        if isinstance(obj, list):
+            self.objects.extend(obj)
+        elif isinstance(obj, Object):
+            self.objects.append(obj)
+        elif isinstance(obj, Scene):
+            self.objects.extend(obj.objects)
 
     def Move(self, *args):
         for obj in self.objects:
@@ -70,6 +75,6 @@ class Scene:
         for obj in self.objects:
             obj.LoopOut()
 
-    def print_scene(self, file_header = None):
+    def print_scene(self, file_header=None):
         for obj in self.objects:
             obj.print_object(file_header)
