@@ -180,13 +180,13 @@ class Color(Code):
 
 
 class Loop(Code):
-    def __init__(self, timing, loopcount, loop_level=0):
-        Code.__init__(self, 'L', timing, data=loopcount, loop_level=loop_level)
+    def __init__(self, timing, loop_count, loop_level=0):
+        Code.__init__(self, 'L', timing, data=loop_count, loop_level=loop_level)
 
 
 class Trigger(Code):
-    def __init__(self, timing, triggerType, loop_level=0):
-        Code.__init__(self, 'T', timing, data=triggerType, loop_level=loop_level)
+    def __init__(self, timing, trigger_type, loop_level=0):
+        Code.__init__(self, 'T', timing, data=trigger_type, loop_level=loop_level)
 
 
 class Parameter(Code):
