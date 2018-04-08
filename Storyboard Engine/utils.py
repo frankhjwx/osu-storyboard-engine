@@ -1,3 +1,6 @@
+import shutil
+
+
 def time_parser(s):
     args = s.split(':')
     m = int(args[0])
@@ -26,3 +29,11 @@ def array_to_list(l, a=None):
         else:
             a.append(i)
     return a
+
+
+def copy_file(src_name, dst_name):
+    try:
+        shutil.copy(src_name, dst_name)
+    except shutil.SameFileError:
+        pass
+    return

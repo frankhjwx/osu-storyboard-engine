@@ -12,7 +12,12 @@ class Scene:
             self.objects = args[0]
     
     def append(self, obj):
-        self.objects.append(obj)
+        if isinstance(obj, list):
+            self.objects.extend(obj)
+        elif isinstance(obj, Object):
+            self.objects.append(obj)
+        elif isinstance(obj, Scene):
+            self.objects.extend(obj.objects)
 
     def Move(self, *args):
         for obj in self.objects:
