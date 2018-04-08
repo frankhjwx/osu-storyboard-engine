@@ -99,9 +99,12 @@ class LyricParser:
         file = open(filename, encoding='utf8', errors='ignore')
         for line in file:
             if 'Dialogue:' in line:
-                if '{\\k' not in line:
-                    continue
                 args = line.split(',')
+                if '{\\k' not in line:
+                    t1 = self.timing_parser(args[1])
+                    t2 = self.timing_parser(args[2])
+                    self.sentences.append(Sentence(args[9][:-1], t1, t2, self.CR))
+                    continue
                 t1 = self.timing_parser(args[1])
                 t2 = self.timing_parser(args[2])
                 current_s = Sentence('', t1, t2)

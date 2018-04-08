@@ -23,7 +23,6 @@ class StoryboardManager:
         self.storyboard_file_header = self.get_storyboard_file_header()
         self.diff_specific_headers = self.get_osu_file_headers()
 
-
     def set_bg(self, filename):
         # all bgs set here will be set hidden in storyboard
         if isinstance(filename, list):
@@ -49,6 +48,10 @@ class StoryboardManager:
     def generate_storyboard(self, diff_specific=False):
         if self.restore:
             return
+
+        for i in range(len(self.scenes)):
+            if self.scene_file_headers[i] == '':
+                self.scenes[i].print_scene('')
         # deal with osb file first
         self.storyboard_file_header.write(
             '[Events]\n'
@@ -69,19 +72,21 @@ class StoryboardManager:
                 for line in self.diff_specific_parts[diff_name][0]:
                     self.diff_specific_headers[diff_name].write(line)
                 for i in range(len(self.scenes)):
-                    if self.scene_file_headers[i] == self.diff_specific_headers[diff_name]:
-                        self.scenes[i].print_scene(self.scene_file_headers[i])
+                    if self.scene_file_headers[i] == diff_name:
+                        self.scenes[i].print_scene(self.diff_specific_headers[diff_name])
                 for line in self.diff_specific_parts[diff_name][2]:
                     self.diff_specific_headers[diff_name].write(line)
 
     def create_backup(self):
         backup_filename = os.path.join(self.map_folder_path, self.storyboard_filename.split('.')[0]+'.bak1')
-        copy_file(self.storyboard_file, backup_filename)
+        if not os.path.exists(backup_filename):
+            copy_file(self.storyboard_file, backup_filename)
         for (dir_path, _, file_names) in os.walk(self.map_folder_path):
             for fn in file_names:
                 if '.osu' in fn:
                     backup_filename = os.path.join(dir_path, fn.split('.')[0] + '.bak2')
-                    copy_file(os.path.join(dir_path, fn), backup_filename)
+                    if not os.path.exists(backup_filename):
+                        copy_file(os.path.join(dir_path, fn), backup_filename)
 
     def restore_backup(self):
         backup_filename = os.path.join(self.map_folder_path, self.storyboard_filename.split('.')[0]+'.bak1')

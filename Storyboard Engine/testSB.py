@@ -7,7 +7,7 @@ import random
 import math
 
 pi = 3.1415926
-song_folder = 'F:\osu!\Songs\\747823 Eisyo-kobu - Oriental Blossom'
+song_folder = 'E:\\747823 Eisyo-kobu - Oriental Blossom'
 sb_filename = 'Eisyo-kobu - Oriental Blossom (Spectator).osb'
 difftoMapper = {
     'Cup': 3, 'Salad': 3, 'Platter': 3, 'Rain': 3, 'Oriental': 3,
@@ -15,6 +15,7 @@ difftoMapper = {
     "Ascendance's Overdose": 5, "Razor's Overdose": 8
 }
 spacing = 0
+
 
 def Background():
     objs = []
@@ -724,6 +725,7 @@ SBManager.append_scene(lanterns)
 SBManager.append_scene(title)
 
 for p in SBManager.get_diff_names():
+    SBManager.append_scene(bg, p)
     SBManager.append_scene(diff[p], p)
 
 SBManager.generate_storyboard(diff_specific=True)
