@@ -7,7 +7,8 @@ import random
 import math
 
 pi = 3.1415926
-songFolder = 'F:\osu!\Songs\\747823 Eisyo-kobu - Oriental Blossom'
+song_folder = 'F:\osu!\Songs\\747823 Eisyo-kobu - Oriental Blossom'
+sb_filename = 'Eisyo-kobu - Oriental Blossom (Spectator).osb'
 difftoMapper = {
     'Cup': 3, 'Salad': 3, 'Platter': 3, 'Rain': 3, 'Oriental': 3,
     "Himiko's Rain": 6, "Plus's Overdose": 7, "Sinnoh's Overdose": 4,
@@ -657,8 +658,7 @@ def generateDiff(lp, diff_name):
 # Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Storyboard by
 
 
-SBManager = StoryboardManager('E:\\747823 Eisyo-kobu - Oriental Blossom',
-                              'Eisyo-kobu - Oriental Blossom (Spectator).osb', create_backup=True)
+SBManager = StoryboardManager(song_folder, sb_filename, create_backup=True)
 SBManager.set_bg(['himiko.jpg', 'me.jpg', 'ascendance.jpg', 'bg-plus.jpg', 'bg-razor.jpg', 'sino.jpg'])
 
 CR = CharacterRenderer(font_path='Fonts/LEVIBRUSH.TTF', file_path='SB/letters/')
