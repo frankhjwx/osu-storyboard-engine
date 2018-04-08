@@ -37,13 +37,16 @@ class StoryboardManager:
     # file_header = '' -> print to cmd window
     # file_header = diff_specific_headers[?] -> point to a single diff
     # file_header = diff_name -> point to a single diff
-    def append_scene(self, scene, file_header=None):
+    def append_scene(self, scene, file_header=None, cmd_window=False):
         if self.restore:
             return
         if file_header is None:
             file_header = self.storyboard_file_header
         self.scenes.append(scene)
-        self.scene_file_headers.append(file_header)
+        if cmd_window:
+            self.scene_file_headers.append('')
+        else:
+            self.scene_file_headers.append(file_header)
 
     def generate_storyboard(self, diff_specific=False):
         if self.restore:
@@ -51,7 +54,7 @@ class StoryboardManager:
 
         for i in range(len(self.scenes)):
             if self.scene_file_headers[i] == '':
-                self.scenes[i].print_scene('')
+                self.scenes[i].print_scene()
         # deal with osb file first
         self.storyboard_file_header.write(
             '[Events]\n'

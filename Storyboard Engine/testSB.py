@@ -728,5 +728,7 @@ for p in SBManager.get_diff_names():
     SBManager.append_scene(bg, p)
     SBManager.append_scene(diff[p], p)
 
+SBManager.append_scene(bg, cmd_window=True)
+
 SBManager.generate_storyboard(diff_specific=True)
 #SBManager.delete_backups()
