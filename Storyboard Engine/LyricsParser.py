@@ -1,6 +1,7 @@
 # coding: utf-8
 import os
 import pygame
+from utils import *
 
 
 class Letter:
@@ -65,17 +66,18 @@ class CharacterRenderer:
 
 
 class Sentence:
-    def __init__(self, content='', start_t=0, end_t=0, character_renderer=None):
+    def __init__(self, content='', start_t=normalize_timing_format(0), end_t=normalize_timing_format(0),
+                 character_renderer=None):
         self.letters = []
         self.content = content
-        self.start_t = start_t
-        self.end_t = end_t
+        self.start_t = normalize_timing_format(start_t)
+        self.end_t = normalize_timing_format(end_t)
         if content != '':
             for ch in content:
                 letter = Letter(ch, 0, start_t, end_t)
                 character_renderer.set_ch(letter)
-                letter.start_t = start_t
-                letter.end_t = end_t
+                letter.start_t = self.start_t
+                letter.end_t = self.end_t
                 self.letters.append(letter)
 
     def set_time(self, start_t, end_t):
@@ -152,8 +154,9 @@ if __name__ == '__main__':
     LP.ass_reader('Subtitles\subtitles.ass')
     sentences = LP.get_sentences()
     sentences.append(Sentence('麻花牛逼', 500, 1000, CR))
+    sentences.append(Sentence('yf大师牛逼', '00:50:123', '01:12:123', CR))
     for sen in sentences:
         print(sen.content, sen.start_t, sen.end_t)
         for ch in sen.letters:
             print(ch.character, ch.width, ch.start_t, ch.end_t)
-    CR.render()
+    #CR.render()
