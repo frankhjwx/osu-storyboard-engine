@@ -11,6 +11,19 @@ def time_parser(s):
     return (m * 60 + s) * 1000 + ms
 
 
+def normalize_timing_format(t):
+    if isinstance(t, str):
+        ts = t.split(':')
+        if len(ts) == 1:
+            return int(ts[0])
+        elif len(ts) == 3:
+            return time_parser(t)
+        else:
+            raise RuntimeError('Wrong Timing Format.')
+    else:
+        return int(t)
+
+
 def command(*args):
     s = ','.join(str(arg) for arg in args)
     return s
