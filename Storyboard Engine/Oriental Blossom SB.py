@@ -484,10 +484,13 @@ def SakuraEffect():
 
 def Torli(timing, cx, cy):
     start_t = timing - 200
-    end_t = timing + 100
+    end_t = timing + 200
     torli = Object('SB/torli.png')
-    torli.Move(2, start_t, end_t, cx, cy, 425, 300)
-    torli.Scale(2, start_t, end_t, 0.05, 2)
+    torli.Move(9, start_t, end_t, cx, cy, 425, 300)
+    torli.Scale(9, start_t, end_t, 0.05, 2)
+    torli.Rotate(5, 87140, 88888, -0.1, 0.05)
+    torli.Fade(start_t, start_t + 300, 0, 1)
+    torli.Fade(end_t, 0)
     return torli
 
 def CrossTorli():
