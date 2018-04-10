@@ -1,6 +1,6 @@
-import copy
-from StoryboardCode import *
-from StoryboardObject import *
+from Storyboard.StoryboardObject import *
+
+# Still under development
 
 
 class Composition:

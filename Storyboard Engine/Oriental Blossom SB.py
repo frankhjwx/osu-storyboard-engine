@@ -1,10 +1,7 @@
 # This is a Storyboard for https://osu.ppy.sh/beatmapsets/747823/, check it for the visualization!
 
-from StoryboardScene import *
-from StoryboardManager import *
-from utils import *
-from BeatmapParser import *
-from LyricsParser import *
+from Storyboard.StoryboardManager import *
+from tools.LyricsParser import *
 import random
 import math
 

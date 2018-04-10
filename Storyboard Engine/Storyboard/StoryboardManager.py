@@ -1,4 +1,4 @@
-from StoryboardScene import *
+from Storyboard.StoryboardScene import *
 import os
 
 
