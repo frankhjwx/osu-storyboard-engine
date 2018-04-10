@@ -1,6 +1,5 @@
 from funcy import flatten
-import copy
-from utils import *
+from tools.utils import *
 
 code_arg_num = {
     'M': 2, 'F': 1, 'S': 1,
