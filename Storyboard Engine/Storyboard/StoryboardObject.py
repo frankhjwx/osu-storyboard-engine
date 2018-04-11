@@ -1,6 +1,9 @@
 from Storyboard.StoryboardCode import *
+import tools.easingFuncs
+import math
 
 
+MIN_T = 1145141919810
 # Old Class, will be modified later
 class Object:
     def __init__(self, file_name, object_type='Sprite', layer='Foreground', origin='Centre', x=320, y=240,
@@ -21,6 +24,7 @@ class Object:
                 raise RuntimeError('Not supported LoopType for animation.')
         self.loop_type = loop_type
         self.current_loop_level = 0
+        self.start_t = MIN_T
 
     def append(self, x):
         # if X is a Code
@@ -53,6 +57,9 @@ class Object:
         # M,0,t1,x1,y1
         elif len(args) == 3:
             self.codes.append(Move(args[0:1], args[1:3], 0, loop_level=self.current_loop_level))
+        # M,0,start_t,x1,y1
+        elif len(args) == 2:
+            self.codes.append(Move(MIN_T, args[0:2], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Move Command is wrong.')
 
@@ -70,6 +77,8 @@ class Object:
         # V,0,t1,x1,y1
         elif len(args) == 3:
             self.codes.append(Vector(args[0:1], args[1:3], 0, loop_level=self.current_loop_level))
+        elif len(args) == 2:
+            self.codes.append(Vector(MIN_T, args[0:2], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Vector Command is wrong.')
 
@@ -83,6 +92,8 @@ class Object:
             self.codes.append(MoveX(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(MoveX(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(MoveX(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of MoveX Command is wrong.')
 
@@ -96,6 +107,8 @@ class Object:
             self.codes.append(MoveY(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(MoveY(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(MoveY(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of MoveY Command is wrong.')
 
@@ -109,6 +122,8 @@ class Object:
             self.codes.append(VectorX(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(VectorX(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(VectorX(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of VectorX Command is wrong.')
 
@@ -122,6 +137,8 @@ class Object:
             self.codes.append(VectorY(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(VectorY(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(VectorY(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of VectorY Command is wrong.')
 
@@ -135,6 +152,8 @@ class Object:
             self.codes.append(Fade(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(Fade(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(Fade(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Fade Command is wrong.')
 
@@ -148,6 +167,8 @@ class Object:
             self.codes.append(Rotate(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(Rotate(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(Rotate(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Rotate Command is wrong.')
 
@@ -161,6 +182,8 @@ class Object:
             self.codes.append(Scale(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(Scale(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(Scale(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Scale Command is wrong.')
 
@@ -174,6 +197,8 @@ class Object:
             self.codes.append(Color(args[0:2], args[2:5], 0, loop_level=self.current_loop_level))
         elif len(args) == 4:
             self.codes.append(Color(args[0:1], args[1:4], 0, loop_level=self.current_loop_level))
+        elif len(args) == 3:
+            self.codes.append(Color(MIN_T, args[0:3], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Color Command is wrong.')
 
@@ -185,6 +210,8 @@ class Object:
             self.codes.append(Parameter(args[0:2], args[2:3], 0, loop_level=self.current_loop_level))
         elif len(args) == 2:
             self.codes.append(Parameter(args[0:1], args[1:2], 0, loop_level=self.current_loop_level))
+        elif len(args) == 1:
+            self.codes.append(Parameter(MIN_T, args[0:1], 0, loop_level=self.current_loop_level))
         else:
             raise RuntimeError('Arg Num of Parameter Command is wrong.')
 
@@ -223,7 +250,66 @@ class Object:
         else:
             raise RuntimeError('Not in codes list.')
 
+    # We suppose there're no bugs in your coding! We don't check conflicts!
+    def get_status(self, timing):
+        for code in self.codes:
+            if isinstance(code, Trigger) or isinstance(code, Loop):
+                continue
+            if code.timing[0] < self.start_t:
+                self.start_t = code.timing[0]
+        if self.start_t == MIN_T:
+            raise RuntimeError('No definition for the start time of this object!')
+        status = {}
+        for key in code_arg_num:
+            if key == 'P' or key == 'L' or key == 'T':
+                continue
+            code_list = [code for code in self.codes if code.key == key]
+            if code_list == []:
+                status[key] = None
+            else:
+                status[key] = self.get_status_key(key, timing, code_list)
+        return status
+
+    def get_status_key(self, key, timing, code_list):
+        if timing < self.start_t:
+            return None
+        code_list = sorted(code_list, key=lambda c: c.timing[0])
+        for code in code_list:
+            if timing < code.timing[0]:
+                return code.data[0:code_arg_num[key]]
+            if code.timing[1] != '' and code.timing[0] < timing < code.timing[1]:
+                start_v = code.data[0:code_arg_num[key]]
+                if len(code.data) > code_arg_num[key]:
+                    end_v = code.data[code_arg_num[key]:len(code.data)]
+                else:
+                    end_v = start_v
+                start_v = [float(v) for v in start_v]
+                end_v = [float(v) for v in end_v]
+                return self.get_easing_value(code.easing, code.timing[0], code.timing[1], start_v, end_v, timing)
+        code = code_list[len(code_list)-1]
+        start_v = code.data[0:code_arg_num[key]]
+        if len(code.data) > code_arg_num[key]:
+            end_v = code.data[code_arg_num[key]:len(code.data)]
+        else:
+            end_v = start_v
+        return end_v
+
+    def get_easing_value(self, easing, start_t, end_t, start_v, end_v, timing):
+        t = (timing - start_t) / (end_t - start_t)
+        value = [start_v[i] + tools.easingFuncs.numToEasing[easing](t)*(end_v[i]-start_v[i]) for i in range(len(start_v))]
+        return value
+
     def print_object(self, file_header=None):
+        for code in self.codes:
+            if isinstance(code, Trigger) or isinstance(code, Loop):
+                continue
+            if code.timing[0] < self.start_t:
+                self.start_t = code.timing[0]
+        if self.start_t == MIN_T:
+            raise RuntimeError('No definition for the start time of this object!')
+        for code in self.codes:
+            if code.timing[0] == MIN_T:
+                code.timing[0] = self.start_t
         if self.object_type == 'Sprite':
             obj_header = ','.join(
                 [self.object_type, self.layer, self.origin, self.file_name, str(self.x), str(self.y)])
@@ -246,12 +332,10 @@ if __name__ == '__main__':
     White = [255, 255, 255]
 
     obj = Object('star.png', object_type='Animation', frame_count=24, frame_delay=40, loop_type='LoopOnce')
-    obj.Move('00:23:345', 320, 240)
-    obj.Rotate('00:24:560', '00:26:402', 1, 30.234)
-    obj.Fade('00:25:400', '00:30:300', 1, 0)
-    obj.Trigger('Hitsound', 30000, 40000)
-    obj.Vector(0, 0, 0)
-    obj.LoopOut()
-    obj.Color('00:23:345', Red)
-    obj.remove_by_index(2)
+    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
+    obj.Rotate(10, 100, 5000, -math.pi, math.pi*10)
+    obj.Parameter('A')
+    obj.Parameter('H')
+    obj.Vector(854, 480)
     obj.print_object()
+    print(obj.get_status(5000))
