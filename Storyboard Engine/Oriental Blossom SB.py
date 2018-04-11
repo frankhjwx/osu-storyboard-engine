@@ -484,10 +484,13 @@ def SakuraEffect():
 
 def Torli(timing, cx, cy):
     start_t = timing - 200
-    end_t = timing + 100
+    end_t = timing + 200
     torli = Object('SB/torli.png')
-    torli.Move(2, start_t, end_t, cx, cy, 425, 300)
-    torli.Scale(2, start_t, end_t, 0.05, 2)
+    torli.Move(9, start_t, end_t, cx, cy, 425, 300)
+    torli.Scale(9, start_t, end_t, 0.05, 2)
+    torli.Rotate(5, 87140, 88888, -0.1, 0.05)
+    torli.Fade(start_t, start_t + 300, 0, 1)
+    torli.Fade(end_t, 0)
     return torli
 
 def CrossTorli():
@@ -672,7 +675,7 @@ CR = CharacterRenderer(font_path='Fonts/LEVIBRUSH.TTF', file_path='SB/letters/')
 subtitles = LyricParser(CR)
 subtitles.ass_reader('Subtitles\subtitles.ass')
 # If Character set already generated before, CR.render() can be omitted
-CR.render()
+#CR.render()
 
 bg = Background()
 bgBlossoms = BGBlossoms()
@@ -738,7 +741,8 @@ for diff_name in SBManager.get_diff_names():
     SBManager.append_scene(diff[diff_name], diff_name)
 
 # This can be used to check some commands inside command window.
-# SBManager.append_scene(bg, cmd_window=True)
+# These codes won't be generated into storyboard files
+# SBManager.append_scene(torlis, cmd_window=True)
 
 SBManager.generate_storyboard(diff_specific=True)
-#SBManager.delete_backups()
+SBManager.delete_backups()

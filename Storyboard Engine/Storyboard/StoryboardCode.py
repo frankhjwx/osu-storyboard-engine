@@ -116,6 +116,11 @@ class Code:
             return flatten([self.key, self.timing, self.data])
         if self.key == 'T':
             return flatten([self.key, self.data, self.timing])
+        for i in range(len(self.data)):
+            if isinstance(self.data[i], float):
+                self.data[i] = str('%.3f' %self.data[i])
+                if self.data[i].split('.')[1] == '000':
+                    self.data[i] = self.data[i].split('.')[0]
         return flatten([self.key, self.easing, self.timing, self.data])
 
     def get_string(self):
