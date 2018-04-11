@@ -20,8 +20,7 @@ class StoryboardManager:
         if restore_backup:
             self.restore_backup()
             return
-        self.storyboard_file_header = self.get_storyboard_file_header()
-        self.diff_specific_headers = self.get_osu_file_headers()
+        self.cal_diff_names()
 
     def set_bg(self, filename):
         # all bgs set here will be set hidden in storyboard
@@ -33,15 +32,15 @@ class StoryboardManager:
     def get_diff_names(self):
         return self.diff_names
 
-    # file_header = None -> point to self.storyboard_file_header
-    # file_header = '' -> print to cmd window
+    # file_header = None -> point to None -> self.storyboard_file_header
+    # cmd_window = True -> file_header = '' -> print to cmd window
     # file_header = diff_specific_headers[?] -> point to a single diff
     # file_header = diff_name -> point to a single diff
     def append_scene(self, scene, file_header=None, cmd_window=False):
         if self.restore:
             return
         if file_header is None:
-            file_header = self.storyboard_file_header
+            file_header = None
         self.scenes.append(scene)
         if cmd_window:
             self.scene_file_headers.append('')
@@ -51,34 +50,35 @@ class StoryboardManager:
     def generate_storyboard(self, diff_specific=False):
         if self.restore:
             return
-
+        storyboard_file_header = self.get_storyboard_file_header()
+        diff_specific_headers = self.get_osu_file_headers()
         for i in range(len(self.scenes)):
             if self.scene_file_headers[i] == '':
                 self.scenes[i].print_scene()
         # deal with osb file first
-        self.storyboard_file_header.write(
+        storyboard_file_header.write(
             '[Events]\n'
             '//Background and Video events\n')
         for img in self.background_images:
-            self.storyboard_file_header.write('Sprite,Background,TopLeft,"' + img + '",0,0\n')
-        self.storyboard_file_header.write(
+            storyboard_file_header.write('Sprite,Background,TopLeft,"' + img + '",0,0\n')
+        storyboard_file_header.write(
             '//Storyboard Layer 0 (Background)\n'
             '//Storyboard Layer 1 (Fail)\n'
             '//Storyboard Layer 2 (Pass)\n'
             '//Storyboard Layer 3 (Foreground)\n')
         for i in range(len(self.scenes)):
-            if self.scene_file_headers[i] == self.storyboard_file_header:
-                self.scenes[i].print_scene(self.storyboard_file_header)
-        self.storyboard_file_header.write('//Storyboard Sound Samples\n')
+            if self.scene_file_headers[i] is None:
+                self.scenes[i].print_scene(storyboard_file_header)
+        storyboard_file_header.write('//Storyboard Sound Samples\n')
         if diff_specific:
             for diff_name in self.diff_names:
                 for line in self.diff_specific_parts[diff_name][0]:
-                    self.diff_specific_headers[diff_name].write(line)
+                    diff_specific_headers[diff_name].write(line)
                 for i in range(len(self.scenes)):
                     if self.scene_file_headers[i] == diff_name:
-                        self.scenes[i].print_scene(self.diff_specific_headers[diff_name])
+                        self.scenes[i].print_scene(diff_specific_headers[diff_name])
                 for line in self.diff_specific_parts[diff_name][2]:
-                    self.diff_specific_headers[diff_name].write(line)
+                    diff_specific_headers[diff_name].write(line)
 
     def create_backup(self):
         backup_filename = os.path.join(self.map_folder_path, self.storyboard_filename.split('.')[0]+'.bak1')
@@ -107,13 +107,12 @@ class StoryboardManager:
         file_header = open(self.storyboard_file, 'w', encoding='utf-8', errors='ignore')
         return file_header
 
-    def get_osu_file_headers(self):
+    def cal_diff_names(self):
         diff_paths = []
         for (dir_path, _, file_names) in os.walk(self.map_folder_path):
             for fn in file_names:
                 if '.osu' in fn:
                     diff_paths.append(os.path.join(dir_path, fn))
-        headers = {}
         for path in diff_paths:
             f = open(path, 'r', encoding='utf-8', errors='ignore')
             parts = [[], [], []]
@@ -131,9 +130,25 @@ class StoryboardManager:
                     status += 1
                 if 'Version:' in line:
                     diff_name = line.split(':')[1][:-1]
-            headers[diff_name] = open(path, 'w', encoding='utf-8', errors='ignore')
             self.diff_specific_parts[diff_name] = parts
             self.diff_names.append(diff_name)
+
+    def get_osu_file_headers(self):
+        headers = {}
+        diff_paths = []
+        for (dir_path, _, file_names) in os.walk(self.map_folder_path):
+            for fn in file_names:
+                if '.osu' in fn:
+                    diff_paths.append(os.path.join(dir_path, fn))
+        for path in diff_paths:
+            f = open(path, 'r', encoding='utf-8', errors='ignore')
+            while 1:
+                line = f.readline()
+                if not line:
+                    break
+                if 'Version:' in line:
+                    diff_name = line.split(':')[1][:-1]
+            headers[diff_name] = open(path, 'w', encoding='utf-8', errors='ignore')
         return headers
 
     def delete_backups(self):

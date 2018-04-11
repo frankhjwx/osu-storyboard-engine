@@ -675,7 +675,7 @@ CR = CharacterRenderer(font_path='Fonts/LEVIBRUSH.TTF', file_path='SB/letters/')
 subtitles = LyricParser(CR)
 subtitles.ass_reader('Subtitles\subtitles.ass')
 # If Character set already generated before, CR.render() can be omitted
-CR.render()
+#CR.render()
 
 bg = Background()
 bgBlossoms = BGBlossoms()
@@ -741,7 +741,8 @@ for diff_name in SBManager.get_diff_names():
     SBManager.append_scene(diff[diff_name], diff_name)
 
 # This can be used to check some commands inside command window.
-# SBManager.append_scene(bg, cmd_window=True)
+# These codes won't be generated into storyboard files
+# SBManager.append_scene(torlis, cmd_window=True)
 
 SBManager.generate_storyboard(diff_specific=True)
-#SBManager.delete_backups()
+SBManager.delete_backups()
