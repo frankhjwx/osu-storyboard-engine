@@ -1,4 +1,4 @@
-# Original realization from Damnae's Storybrew
+# Original realization in Damnae's Storybrew
 # https://github.com/Damnae/storybrew/blob/master/common/Animations/EasingFunctions.cs
 import math
 
@@ -16,7 +16,7 @@ QuartOut = lambda x: Reverse(QuartIn, x)
 QuartInOut = lambda x: ToInOut(QuartIn, x)
 QuintIn = lambda x: x**5
 QuintOut = lambda x: Reverse(QuintIn, x)
-QuintInOut = lambda x: ToInOut(QuintIn)
+QuintInOut = lambda x: ToInOut(QuintIn, x)
 
 SineIn = lambda x: 1 - math.cos(x * math.pi / 2)
 SineOut = lambda x: Reverse(SineIn, x)
@@ -31,7 +31,7 @@ CircOut = lambda x: Reverse(CircIn, x)
 CircInOut = lambda x: ToInOut(CircIn, x)
 
 BackIn = lambda x: x * x * ((1.70158 + 1) * x - 1.70158)
-BackOut = lambda x: Reverse(BackIn)
+BackOut = lambda x: Reverse(BackIn, x)
 BackInOut = lambda x: ToInOut(lambda y: y * y * ((1.70158 * 1.525 + 1) * y - 1.70158 * 1.525), x)
 
 BounceOut = lambda x: 7.5625 * x**2 if x < 1 / 2.75 else 7.5625 * (x - (1.5 / 2.75))**2 + 0.75 if x < 2 / 2.75 \
