@@ -3,7 +3,7 @@
 import math
 
 Reverse = lambda func, value: 1 - func(1 - value)
-ToInOut = lambda func, value: 0.5 * (func(2 * value) if value < 0.5 else (2 - 2 * value))
+ToInOut = lambda func, value: 0.5 * (func(2 * value) if value < 0.5 else 2 - func(2 - 2 * value))
 Linear = lambda x: x
 QuadIn = lambda x: x*x
 QuadOut = lambda x: Reverse(QuadIn, x)
