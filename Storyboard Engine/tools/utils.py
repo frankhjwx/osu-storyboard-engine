@@ -1,3 +1,6 @@
+import shutil
+
+
 def time_parser(s):
     args = s.split(':')
     m = int(args[0])
@@ -6,6 +9,19 @@ def time_parser(s):
     if not (0 <= 59 and 0 <= ms <= 999):
         raise RuntimeError('Wrong Timing Format.')
     return (m * 60 + s) * 1000 + ms
+
+
+def normalize_timing_format(t):
+    if isinstance(t, str):
+        ts = t.split(':')
+        if len(ts) == 1:
+            return int(ts[0])
+        elif len(ts) == 3:
+            return time_parser(t)
+        else:
+            raise RuntimeError('Wrong Timing Format.')
+    else:
+        return int(t)
 
 
 def command(*args):
@@ -17,6 +33,7 @@ def get_timing(start_t, end_t=''):
     """Return a list like [start_t, end_t], end_t default value is a empty."""
     return [start_t, end_t]
 
+
 def array_to_list(l, a=None):
     a = list(a) if isinstance(a, (list, tuple)) else []
     for i in l:
@@ -25,3 +42,11 @@ def array_to_list(l, a=None):
         else:
             a.append(i)
     return a
+
+
+def copy_file(src_name, dst_name):
+    try:
+        shutil.copy(src_name, dst_name)
+    except shutil.SameFileError:
+        pass
+    return
