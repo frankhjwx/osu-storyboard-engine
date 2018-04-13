@@ -2,7 +2,7 @@
 import os
 import pygame
 from utils import *
-
+from PIL import Image, ImageFilter
 
 class Letter:
     def __init__(self, ch, i, t1, t2):
@@ -18,7 +18,7 @@ class Letter:
 # fontSize e.g.: 60
 # filePath e.g.: SB/lyrics
 class CharacterRenderer:
-    def __init__(self, font_path="C:/Windows/Fonts/A-OTF-GothicBBBPr5-Medium.otf", font_size=60, file_path="SB/lyrics"):
+    def __init__(self, font_path="./Fonts/Source Code Pro for Powerline.otf", font_size=60, file_path="SB/lyrics"):
         self.characters = []
         self.width = []
         self.font_path = font_path
@@ -64,6 +64,14 @@ class CharacterRenderer:
         self.width.append(r_text.get_size()[0])
         pygame.image.save(r_text, os.path.join(self.file_path, name+".png"))
 
+    def blur(self, r_text, radius):
+        __blur_radius = ImageFilter.GaussianBlur(radius)
+        __image = Image.frombytes("RGBA", data = r_text.get_buffer().raw, size = (r_text.get_width(), r_text.get_height()))
+        __image_blur = __image.filter(__blur_radius)
+        return __image_blur
+
+    def outline(self, fill):
+        pass
 
 class Sentence:
     def __init__(self, content='', start_t=normalize_timing_format(0), end_t=normalize_timing_format(0),
