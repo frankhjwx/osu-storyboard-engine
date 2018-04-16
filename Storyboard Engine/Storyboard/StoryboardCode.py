@@ -130,6 +130,9 @@ class Code:
     def __str__(self):
         return self.get_string()
 
+    def __eq__(self, other):
+        return self.key == other.key and self.easing == other.easing and self.timing == other.timing and self.data == other.data and self.loop_level == other.loop_level
+
     __repr__ = __str__
 
 

@@ -1,4 +1,5 @@
 from Storyboard.StoryboardObject import *
+import copy
 
 # Still under development
 
@@ -14,6 +15,8 @@ class Composition:
 
     def add_object(self, *args):
         for arg in args:
+            if len(arg.conflict_check()) > 0:
+                raise RuntimeError('This is some conflicts in object.')
             self.list.append(arg)
 
     def set_timing_offset(self, ms):
@@ -51,15 +54,17 @@ class Composition:
             obj.print_object(file_header)
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
+def test():
     obj = Object('star.png', object_type='Animation', frame_count=24, frame_delay=40, loop_type='LoopOnce')
-    obj.add_move('00:23:345', 320, 240)
-    obj.add_rotate('00:24:560', '00:26:402', 1, 30.234)
-    obj.add_fade('00:25:400', '00:30:300', 1, 0)
-    obj.add_loop_trigger('Hitsound', 30000, 40000)
-    obj.add_vector(0, 0, 0)
-    obj.loop_out()
-    obj.add_color('00:23:345', [255,0,0])
+    obj.Move('00:23:345', 320, 240)
+    obj.Rotate('00:24:560', '00:26:402', 1, 30.234)
+    # obj.Rotate('00:24:660', '00:26:302', 1, 30.234)
+    obj.Fade('00:25:400', '00:30:300', 1, 0)
+    obj.Trigger('Hitsound', 30000, 40000)
+    obj.Vector(0, 0, 0)
+    obj.LoopOut()
+    obj.Color('00:23:345', [255,0,0])
 
     obj2 = copy.deepcopy(obj)
 

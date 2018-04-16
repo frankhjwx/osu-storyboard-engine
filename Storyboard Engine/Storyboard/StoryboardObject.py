@@ -48,6 +48,7 @@ class Object:
         # M,e,t1,t2,x1,y1,x2,y2
         if len(args) == 7:
             self.codes.append(Move(args[1:3], args[3:7], args[0], loop_level=self.current_loop_level))
+
         # M,0,t1,t2,x1,y1,x2,y2
         elif len(args) == 6:
             self.codes.append(Move(args[0:2], args[2:6], 0, loop_level=self.current_loop_level))
@@ -299,6 +300,62 @@ class Object:
         value = [start_v[i] + tools.easingFuncs.numToEasing[easing](t)*(end_v[i]-start_v[i]) for i in range(len(start_v))]
         return value
 
+    def get_same_key_code(self, key):
+        return list(filter(lambda x: x.key == key, self.codes))
+
+    def __remove_all_same(self):
+        codelist = []
+        [codelist.append(code) for code in self.codes if not code in codelist]
+        self.codes = codelist
+
+    def __get_time_check(self, code1, code2):
+        if code1.timing[1] == '' and code2.timing[1] == '':
+            return False
+        elif code2.timing[1] == '':
+            return code1.timing[0] < code2.timing[0] and code1.timing[1] > code2.timing[0]
+        else:
+            return (code1.timing[0] < code2.timing[0] and code1.timing[1] > code2.timing[0]) or (code1.timing[0] < code2.timing[1] and code1.timing[1] > code2.timing[1])
+
+    # def conflict_check(self):
+    #     self.__remove_all_same()
+    #     tmplist = {}
+    #     for args in code_arg_num:
+    #         # tmplist[args] = self.get_same_key_code(args)
+    #         for code in self.get_same_key_code(args):
+    #             tmp = list(filter(lambda x: self.__get_time_check(code, x), self.get_same_key_code(args)))
+    #             if len(tmp) != 0:
+    #                 tmplist[args] = tmp
+    #     return tmplist
+
+    def confilct_check(self, key):
+        self.__remove_all_same()
+        if key == 'MX' or key == 'MY' or key == 'M':
+            tmp = []
+            tmp.append(self.get_same_key_code('M'))
+            tmp.append(self.get_same_key_code('MX'))
+            tmp.append(self.get_same_key_code('MY'))
+            for code in tmp:
+                if len(list(filter(lambda x: self.__get_time_check(code, x), self.get_same_key_code(tmp)))) != 0:
+                    return True
+                continue
+        elif key == 'V' or key == 'VX' or key == 'VY' or key == 'S':
+            tmp = []
+            tmp.append(self.get_same_key_code('V'))
+            tmp.append(self.get_same_key_code('VX'))
+            tmp.append(self.get_same_key_code('VY'))
+            tmp.append(self.get_same_key_code('S'))
+            for code in tmp:
+                if len(list(filter(lambda x: self.__get_time_check(code, x), self.get_same_key_code(tmp)))) != 0:
+                    return True
+                continue
+        else:
+            for code in self.get_same_key_code(key):
+                tmp = list(filter(lambda x: self.__get_time_check(code, x), self.get_same_key_code(args)))
+                if len(tmp) != 0:
+                    return True
+        return False
+
+
     def print_object(self, file_header=None):
         for code in self.codes:
             if isinstance(code, Trigger) or isinstance(code, Loop):
@@ -334,8 +391,26 @@ if __name__ == '__main__':
     obj = Object('star.png', object_type='Animation', frame_count=24, frame_delay=40, loop_type='LoopOnce')
     obj.Move(5, 1000, 2000, 320, 240, 300, 500)
     obj.Rotate(10, 100, 5000, -math.pi, math.pi*10)
+    obj.Rotate(10, 200, 4800, -math.pi, math.pi*10)
     obj.Parameter('A')
     obj.Parameter('H')
     obj.Vector(854, 480)
     obj.print_object()
     print(obj.get_status(5000))
+
+def test():
+    Red = [255, 0, 0]
+    White = [255, 255, 255]
+
+    obj = Object('star.png', object_type='Animation', frame_count=24, frame_delay=40, loop_type='LoopOnce')
+    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
+    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
+    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
+    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
+    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
+    obj.Rotate(10, 100, 5000, -math.pi, math.pi*10)
+    obj.Rotate(10, 200, 4800, -math.pi, math.pi*10)
+    obj.Parameter('A')
+    obj.Parameter('H')
+    obj.Vector(854, 480)
+    obj.print_object()
