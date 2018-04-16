@@ -1,19 +1,32 @@
-from StoryboardScene import *
-from StoryboardManager import *
-from utils import *
-from BeatmapParser import *
-from LyricsParser import *
+# This is a Storyboard for https://osu.ppy.sh/beatmapsets/747823/, check it for the visualization!
+
+from Storyboard.StoryboardManager import *
+from tools.LyricsParser import *
 import random
 import math
 
+
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Eisyo-kobu
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Oriental Blossom
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Beatmap by
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Spectator
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Sinnoh
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Ascendance
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Yumeno Himiko
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}-Plus-
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Razor Sharp
+# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Storyboard by
+
+# math.pi also works
 pi = 3.1415926
-song_folder = 'E:\\747823 Eisyo-kobu - Oriental Blossom'
+song_folder = 'F:/osu!/Songs/747823 Eisyo-kobu - Oriental Blossom'
 sb_filename = 'Eisyo-kobu - Oriental Blossom (Spectator).osb'
 difftoMapper = {
     'Cup': 3, 'Salad': 3, 'Platter': 3, 'Rain': 3, 'Oriental': 3,
     "Himiko's Rain": 6, "Plus's Overdose": 7, "Sinnoh's Overdose": 4,
     "Ascendance's Overdose": 5, "Razor's Overdose": 8
 }
+# text spacing
 spacing = 0
 
 
@@ -471,10 +484,13 @@ def SakuraEffect():
 
 def Torli(timing, cx, cy):
     start_t = timing - 200
-    end_t = timing + 100
+    end_t = timing + 200
     torli = Object('SB/torli.png')
-    torli.Move(2, start_t, end_t, cx, cy, 425, 300)
-    torli.Scale(2, start_t, end_t, 0.05, 2)
+    torli.Move(9, start_t, end_t, cx, cy, 425, 300)
+    torli.Scale(9, start_t, end_t, 0.05, 2)
+    torli.Rotate(5, 87140, 88888, -0.1, 0.05)
+    torli.Fade(start_t, start_t + 300, 0, 1)
+    torli.Fade(end_t, 0)
     return torli
 
 def CrossTorli():
@@ -647,24 +663,19 @@ def generateDiff(lp, diff_name):
     objs.append(genLyric(lp.sentences[6], 400, 340, 112673, 115173))
     return objs
 
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Eisyo-kobu
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Oriental Blossom
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Beatmap by
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Spectator
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Sinnoh
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Ascendance
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Yumeno Himiko
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}-Plus-
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Razor Sharp
-# Dialogue: 0,0:01:50.37,0:01:55.98,Default,,0,0,0,,{\k561}Storyboard by
 
-
+# Create StoryboardManager
 SBManager = StoryboardManager(song_folder, sb_filename, create_backup=True)
+
+# These backgrounds will be set to invisible in storyboard.
 SBManager.set_bg(['himiko.jpg', 'me.jpg', 'ascendance.jpg', 'bg-plus.jpg', 'bg-razor.jpg', 'sino.jpg'])
 
+# Create a CharacterRenderer
 CR = CharacterRenderer(font_path='Fonts/LEVIBRUSH.TTF', file_path='SB/letters/')
 subtitles = LyricParser(CR)
 subtitles.ass_reader('Subtitles\subtitles.ass')
+# If Character set already generated before, CR.render() can be omitted
+#CR.render()
 
 bg = Background()
 bgBlossoms = BGBlossoms()
@@ -687,10 +698,11 @@ torlis = CrossTorli()
 ending = Ending()
 endingblack = EndingBlack()
 
+# create subtitles for each diff
 title = generateTitle(subtitles)
 diff = {}
-for p in SBManager.get_diff_names():
-    diff[p] = generateDiff(subtitles, p)
+for diff_name in SBManager.get_diff_names():
+    diff[diff_name] = generateDiff(subtitles, diff_name)
 
 bg.Fade(87340, 87341, 1, 0)
 bg.Fade(88673, 1)
@@ -724,12 +736,13 @@ SBManager.append_scene(fans)
 SBManager.append_scene(lanterns)
 SBManager.append_scene(title)
 
-for p in SBManager.get_diff_names():
-    SBManager.append_scene(bg, p)
-    SBManager.append_scene(diff[p], p)
+for diff_name in SBManager.get_diff_names():
+    SBManager.append_scene(bg, diff_name)
+    SBManager.append_scene(diff[diff_name], diff_name)
 
-SBManager.append_scene(bg, cmd_window=True)
-print(SBManager.get_diff_names())
+# This can be used to check some commands inside command window.
+# These codes won't be generated into storyboard files
+# SBManager.append_scene(torlis, cmd_window=True)
 
 SBManager.generate_storyboard(diff_specific=True)
-#SBManager.delete_backups()
+SBManager.delete_backups()

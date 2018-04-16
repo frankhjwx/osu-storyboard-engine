@@ -1,6 +1,4 @@
-from utils import *
-from StoryboardCode import *
-from StoryboardObject import *
+from Storyboard.StoryboardObject import *
 
 
 class Scene:

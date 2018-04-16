@@ -2,8 +2,10 @@ import codecs
 import math
 import os
 import re
+import bisect
 
 from BeatmapParser import slidercalc
+from tools.utils import *
 
 
 # Translated from JavaScript to Python by Awlex
@@ -33,6 +35,7 @@ class BeatmapParser():
             "P": "pass-through"
         }
         self.control_points = []
+        self.control_timings = []
 
     # Get the timing point affecting a specific offset
     # @param  {Integer} offset
@@ -294,7 +297,9 @@ class BeatmapParser():
         for obj in self.beatmap['hitObjects']:
             if obj['object_name'] == 'circle':
                 self.control_points.append([obj['startTime'], obj['position']])
+                self.control_timings.append(obj['startTime'])
             if obj['object_name'] == 'slider':
+                # print(obj['repeatCount'], obj['edges'])
                 t0 = obj['startTime']
                 t1 = obj['end_time']
                 sliderlength = obj['pixelLength']
@@ -313,10 +318,35 @@ class BeatmapParser():
                         position = slidercalc.get_end_point(obj["curveType"], length, obj["points"])
                         if position and position[0] and position[1]:
                             self.control_points.append([int(current_t),[round(position[0]), round(position[1])]])
+                            self.control_timings.append(int(current_t))
                         if length == 0:
                             self.control_points.append([int(current_t),obj['position']])
+                            self.control_timings.append(int(current_t))
                         current_t += beatlength
 
+    def get_position(self, timing):
+        control_timings = self.control_timings
+        t = normalize_timing_format(timing)
+        # if t is out of beatmap range
+        if t <= control_timings[0]:
+            return self.control_points[0][1]
+        if t >= control_timings[len(control_timings)-1]:
+            return self.control_points[len(control_timings)-1][1]
+
+        i = bisect.bisect_left(control_timings, t)
+        if self.control_points[i-1][0] == t:
+            return self.control_points[i-1][1]
+        t1 = control_timings[i-1]
+        t2 = control_timings[i]
+        pos1 = self.control_points[i-1][1]
+        pos2 = self.control_points[i][1]
+        pos = [int((pos2[0]-pos1[0])*(t-t1)/(t2-t1) + pos1[0]), int((pos2[1]-pos1[1])*(t-t1)/(t2-t1) + pos1[1])]
+        return pos
+
+    # will get a hitsound only when it has a note, otherwise it will return None
+    # tbd
+    def get_hitsound(self, timing):
+        return None
 
     # Browse objects and compute max combo
     def compute_max_combo(self):

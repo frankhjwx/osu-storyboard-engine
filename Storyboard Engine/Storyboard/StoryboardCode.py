@@ -1,6 +1,5 @@
 from funcy import flatten
-import copy
-from utils import *
+from tools.utils import *
 
 code_arg_num = {
     'M': 2, 'F': 1, 'S': 1,
@@ -117,6 +116,11 @@ class Code:
             return flatten([self.key, self.timing, self.data])
         if self.key == 'T':
             return flatten([self.key, self.data, self.timing])
+        for i in range(len(self.data)):
+            if isinstance(self.data[i], float):
+                self.data[i] = str('%.3f' %self.data[i])
+                if self.data[i].split('.')[1] == '000':
+                    self.data[i] = self.data[i].split('.')[0]
         return flatten([self.key, self.easing, self.timing, self.data])
 
     def get_string(self):
@@ -125,6 +129,9 @@ class Code:
 
     def __str__(self):
         return self.get_string()
+
+    def __eq__(self, other):
+        return self.key == other.key and self.easing == other.easing and self.timing == other.timing and self.data == other.data and self.loop_level == other.loop_level
 
     __repr__ = __str__
 
