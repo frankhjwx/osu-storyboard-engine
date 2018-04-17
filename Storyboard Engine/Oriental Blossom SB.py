@@ -367,6 +367,7 @@ def Scene5():
             square.Fade(start_t, start_t + 200, 0, 1)
             square.Fade(54007, 54673, 1, 0)
             objs.append(square)
+
     return objs
 
 def Scene6():
@@ -735,6 +736,14 @@ SBManager.append_scene(endingblack)
 SBManager.append_scene(fans)
 SBManager.append_scene(lanterns)
 SBManager.append_scene(title)
+
+w = Object('SB/dot.png')
+w.Fade(64673 - 400, 64673, 0, 0.6)
+w.Color([0, 0, 0])
+w.Vector(854, 480)
+w.Fade(66007 - 400, 66007, 0.6, 0)
+scene = Scene([w])
+SBManager.append_scene(scene)
 
 for diff_name in SBManager.get_diff_names():
     SBManager.append_scene(bg, diff_name)

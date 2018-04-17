@@ -4,7 +4,8 @@ import math
 
 
 MIN_T = 1145141919810
-# Old Class, will be modified later
+
+
 class Object:
     def __init__(self, file_name, object_type='Sprite', layer='Foreground', origin='Centre', x=320, y=240,
                  frame_count=0, frame_delay=0, loop_type=''):
@@ -25,6 +26,7 @@ class Object:
         self.loop_type = loop_type
         self.current_loop_level = 0
         self.start_t = MIN_T
+        self.end_t = -MIN_T
 
     def append(self, x):
         # if X is a Code
@@ -250,13 +252,21 @@ class Object:
         else:
             raise RuntimeError('Not in codes list.')
 
-    # We suppose there're no bugs in your coding! We don't check conflicts!
-    def get_status(self, timing):
+    def get_start_end_t(self):
         for code in self.codes:
             if isinstance(code, Trigger) or isinstance(code, Loop):
                 continue
             if code.timing[0] < self.start_t:
                 self.start_t = code.timing[0]
+                if self.end_t == -MIN_T:
+                    self.end_t = code.timing[0]
+            if code.timing[1] != '' and code.timing[1] > self.end_t:
+                self.end_t = code.timing[1]
+
+    # We suppose there're no bugs in your coding! We don't check conflicts!
+    # Many bugs remaining, not suggested to use it for now!
+    def get_status(self, timing):
+        self.get_start_end_t()
         if self.start_t == MIN_T:
             raise RuntimeError('No definition for the start time of this object!')
         status = {}
@@ -271,11 +281,11 @@ class Object:
         return status
 
     def get_status_key(self, key, timing, code_list):
-        if timing < self.start_t:
+        if timing < self.start_t or timing > self.end_t:
             return None
         code_list = sorted(code_list, key=lambda c: c.timing[0])
         for code in code_list:
-            if timing < code.timing[0]:
+            if timing <= code.timing[0]:
                 return code.data[0:code_arg_num[key]]
             if code.timing[1] != '' and code.timing[0] < timing < code.timing[1]:
                 start_v = code.data[0:code_arg_num[key]]
@@ -300,15 +310,11 @@ class Object:
         return value
 
     def print_object(self, file_header=None):
-        for code in self.codes:
-            if isinstance(code, Trigger) or isinstance(code, Loop):
-                continue
-            if code.timing[0] < self.start_t:
-                self.start_t = code.timing[0]
+        self.get_start_end_t()
         if self.start_t == MIN_T:
             raise RuntimeError('No definition for the start time of this object!')
         for code in self.codes:
-            if code.timing[0] == MIN_T:
+            if code.key != 'L' and code.key != 'T' and code.timing[0] == MIN_T:
                 code.timing[0] = self.start_t
         if self.object_type == 'Sprite':
             obj_header = ','.join(
@@ -332,10 +338,11 @@ if __name__ == '__main__':
     White = [255, 255, 255]
 
     obj = Object('star.png', object_type='Animation', frame_count=24, frame_delay=40, loop_type='LoopOnce')
-    obj.Move(5, 1000, 2000, 320, 240, 300, 500)
-    obj.Rotate(10, 100, 5000, -math.pi, math.pi*10)
+    obj.Move(6, 1000, 2000, 320, 240, 300, 500)
+    obj.Rotate(10, 1000, 2000, -math.pi, math.pi*10)
     obj.Parameter('A')
     obj.Parameter('H')
     obj.Vector(854, 480)
     obj.print_object()
-    print(obj.get_status(5000))
+    for i in range(800, 2500, 100):
+        print(i, obj.get_status(i))
