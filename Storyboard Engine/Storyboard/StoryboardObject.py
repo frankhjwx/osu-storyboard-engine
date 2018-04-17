@@ -4,7 +4,8 @@ import math
 
 
 MIN_T = 1145141919810
-# Old Class, will be modified later
+
+
 class Object:
     def __init__(self, file_name, object_type='Sprite', layer='Foreground', origin='Centre', x=320, y=240,
                  frame_count=0, frame_delay=0, loop_type=''):
@@ -263,6 +264,7 @@ class Object:
                 self.end_t = code.timing[1]
 
     # We suppose there're no bugs in your coding! We don't check conflicts!
+    # Many bugs remaining, not suggested to use it for now!
     def get_status(self, timing):
         self.get_start_end_t()
         if self.start_t == MIN_T:
@@ -312,7 +314,7 @@ class Object:
         if self.start_t == MIN_T:
             raise RuntimeError('No definition for the start time of this object!')
         for code in self.codes:
-            if code.timing[0] == MIN_T:
+            if code.key != 'L' and code.key != 'T' and code.timing[0] == MIN_T:
                 code.timing[0] = self.start_t
         if self.object_type == 'Sprite':
             obj_header = ','.join(

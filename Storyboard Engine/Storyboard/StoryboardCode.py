@@ -1,4 +1,3 @@
-from funcy import flatten
 from tools.utils import *
 
 code_arg_num = {
@@ -113,15 +112,15 @@ class Code:
     def get_list(self):
         """Return a list look like [key, easing, start_t, end_t, *data]"""
         if self.key == 'L':
-            return flatten([self.key, self.timing, self.data])
+            return array_to_list([self.key, self.timing, self.data])
         if self.key == 'T':
-            return flatten([self.key, self.data, self.timing])
+            return array_to_list([self.key, self.data, self.timing])
         for i in range(len(self.data)):
             if isinstance(self.data[i], float):
-                self.data[i] = str('%.3f' %self.data[i])
+                self.data[i] = str('%.3f' % self.data[i])
                 if self.data[i].split('.')[1] == '000':
                     self.data[i] = self.data[i].split('.')[0]
-        return flatten([self.key, self.easing, self.timing, self.data])
+        return array_to_list([self.key, self.easing, self.timing, self.data])
 
     def get_string(self):
         """Return a string look like \' M,0,123,456,123,345 \'"""
