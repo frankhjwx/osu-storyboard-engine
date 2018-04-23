@@ -133,8 +133,14 @@ class Scene:
                     view_rotation_list.append(view_rotation)
                     if len(view_pos_list) > 1:
                         k = len(view_pos_list)
-                        SceneObj.Move(timestamps[k-2], timestamps[k-1], view_pos_list[k-2], view_pos_list[k-1])
-                        SceneObj.Vector(timestamps[k-2], timestamps[k-1], view_vector_list[k-2], view_vector_list[k-1])
-                        SceneObj.Rotate(timestamps[k-2], timestamps[k-1], view_rotation_list[k-2], view_rotation_list[k-1])
+                        if view_pos_list[k-2] != view_pos_list[k-1]:
+                            SceneObj.Move(timestamps[k-2], timestamps[k-1],
+                                          view_pos_list[k-2], view_pos_list[k-1])
+                        if view_vector_list[k - 2] != view_vector_list[k - 1]:
+                            SceneObj.Vector(timestamps[k-2], timestamps[k-1],
+                                            view_vector_list[k-2], view_vector_list[k-1])
+                        if view_rotation_list[k - 2] != view_rotation_list[k - 1]:
+                            SceneObj.Rotate(timestamps[k-2], timestamps[k-1],
+                                            view_rotation_list[k-2], view_rotation_list[k-1])
                 SceneObj.print_object(file_header)
 
