@@ -29,7 +29,7 @@ difftoMapper = {
 }
 # text spacing
 spacing = 0
-camera = Camera2D()
+camera = Camera2D(frame_per_second=50)
 
 def Background():
     objs = []
@@ -634,7 +634,7 @@ def Umbrella():
     for i in range(len(timings)):
         umbrella = Object('SB/umbrella.png', x=pos[i][0], y=pos[i][1])
         umbrella.Fade(timings[i] - 100, timings[i], 0, 1)
-        umbrella.Scale(0.6)
+        umbrella.Scale(6, timings[i] - 100, timings[i] + 50, 0.3, 0.6)
         objs.append(umbrella)
         if i>0 :
             camera.Move(9, timings[i-1], timings[i], pos[i-1], pos[i])
