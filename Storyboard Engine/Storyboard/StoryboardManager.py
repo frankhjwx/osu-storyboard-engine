@@ -51,7 +51,8 @@ class StoryboardManager:
         if self.restore:
             return
         storyboard_file_header = self.get_storyboard_file_header()
-        diff_specific_headers = self.get_osu_file_headers()
+        if diff_specific:
+            diff_specific_headers = self.get_osu_file_headers()
         for i in range(len(self.scenes)):
             if self.scene_file_headers[i] == '':
                 self.scenes[i].print_scene()

@@ -19,7 +19,7 @@ import math
 
 # math.pi also works
 pi = 3.1415926
-song_folder = 'F:/osu!/Songs/747823 Eisyo-kobu - Oriental Blossom'
+song_folder = 'E:\\747823 Eisyo-kobu - Oriental Blossom'
 sb_filename = 'Eisyo-kobu - Oriental Blossom (Spectator).osb'
 difftoMapper = {
     'Cup': 3, 'Salad': 3, 'Platter': 3, 'Rain': 3, 'Oriental': 3,

@@ -14,7 +14,9 @@ class Object:
         self.object_type = object_type
         self.layer = layer
         self.origin = origin
-        self.file_name = '\"' + file_name + '\"'
+        self.file_name = file_name
+        if self.file_name[0] != '"':
+            self.file_name = '"'+self.file_name+'"'
         self.x = x
         self.y = y
         self.codes = []
@@ -280,6 +282,37 @@ class Object:
                 status[key] = self.get_status_key(key, timing, code_list)
         return status
 
+    def get_position(self, timing):
+        status = self.get_status(timing)
+        pos = [self.x, self.y]
+        if status['M'] is not None:
+            pos = status['M']
+        if status['MX'] is not None:
+            pos[0] = status['MX'][0]
+        if status['MY'] is not None:
+            pos[1] = status['MY'][0]
+        return pos
+
+    def get_scale(self, timing):
+        status = self.get_status(timing)
+        vector = [1, 1]
+        if status['S'] is not None:
+            vector = [status['S'][0], status['S'][0]]
+        if status['V'] is not None:
+            vector = status['V']
+        if status['VX'] is not None:
+            vector[0] = status['VX'][0]
+        if status['VY'] is not None:
+            vector[1] = status['VY'][0]
+        return vector
+
+    def get_rotation(self, timing):
+        status = self.get_status(timing)
+        rotation = 0
+        if status['R'] is not None:
+            rotation = status['R'][0]
+        return rotation
+
     def get_status_key(self, key, timing, code_list):
         if timing < self.start_t or timing > self.end_t:
             return None
@@ -296,7 +329,7 @@ class Object:
                 start_v = [float(v) for v in start_v]
                 end_v = [float(v) for v in end_v]
                 return self.get_easing_value(code.easing, code.timing[0], code.timing[1], start_v, end_v, timing)
-        code = code_list[len(code_list)-1]
+        code = code_list[len(code_list) - 1]
         start_v = code.data[0:code_arg_num[key]]
         if len(code.data) > code_arg_num[key]:
             end_v = code.data[code_arg_num[key]:len(code.data)]
@@ -345,4 +378,4 @@ if __name__ == '__main__':
     obj.Vector(854, 480)
     obj.print_object()
     for i in range(800, 2500, 100):
-        print(i, obj.get_status(i))
+        print(i, obj.get_position(i), obj.get_scale(i), obj.get_rotation(i), obj.get_status(i))

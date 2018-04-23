@@ -75,6 +75,10 @@ class Code:
         if not (isinstance(easing, int) and 0 <= easing <= 34):
             raise RuntimeError('Easing wrongly set.')
 
+        pattern = re.compile(r'^[+-]?\d+(\.\d+)?$')
+        for d in data:
+            if isinstance(d, str) and re.match(pattern, d):
+                d = float(d)
         self.key = key
         self.easing = easing
         if isinstance(timing, tuple):
@@ -115,12 +119,13 @@ class Code:
             return array_to_list([self.key, self.timing, self.data])
         if self.key == 'T':
             return array_to_list([self.key, self.data, self.timing])
+        tmp_data = copy.deepcopy(self.data)
         for i in range(len(self.data)):
             if isinstance(self.data[i], float):
-                self.data[i] = str('%.3f' % self.data[i])
-                if self.data[i].split('.')[1] == '000':
-                    self.data[i] = self.data[i].split('.')[0]
-        return array_to_list([self.key, self.easing, self.timing, self.data])
+                tmp_data[i] = str('%.3f' % tmp_data[i])
+                if tmp_data[i].split('.')[1] == '000':
+                    tmp_data[i] = tmp_data[i].split('.')[0]
+        return array_to_list([self.key, self.easing, self.timing, tmp_data])
 
     def get_string(self):
         """Return a string look like \' M,0,123,456,123,345 \'"""
