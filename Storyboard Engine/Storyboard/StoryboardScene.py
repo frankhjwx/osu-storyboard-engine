@@ -93,7 +93,7 @@ class Scene:
                 SceneObj = Object(obj.file_name, obj.object_type, obj.layer, obj.origin, obj.x, obj.y, obj.frame_count,
                                   obj.frame_delay, obj.loop_type)
                 for code in obj.codes:
-                    if code.key == 'C' or code.key == 'P' or code.key == 'L' or code.key == 'T':
+                    if code.key == 'C' or code.key == 'P' or code.key == 'L' or code.key == 'T' or code.key == 'F':
                         SceneObj.append(code)
                 timestamps = []
                 for t in range(start_t, end_t, int(1000/self.camera.fps)):
@@ -110,14 +110,14 @@ class Scene:
                     cam_scale = self.camera.get_scale(t)
                     cam_rotation = self.camera.get_rotation(t)
                     # change coordinate system
-                    obj_pos = [obj_pos[0] - 320, obj_pos[1] - 240]
-                    cam_pos = [cam_pos[0] - 320, cam_pos[1] - 240]
+                    obj_pos = [obj_pos[0] - cam_pos[0], obj_pos[1] - cam_pos[1]]
+                    #cam_pos = [cam_pos[0] - 320, cam_pos[1] - 240]
                     rotate = np.array([[math.cos(cam_rotation), math.sin(cam_rotation), 0],
                                        [-math.sin(cam_rotation), math.cos(cam_rotation), 0],
                                        [0, 0, 1]])
                     transition = np.array([[1, 0, 0],
                                            [0, 1, 0],
-                                           [cam_pos[0], cam_pos[1], 1]])
+                                           [0, 0, 1]])
                     scale = np.array([[cam_scale, 0, 0],
                                       [0, cam_scale, 0],
                                       [0, 0, 1]])

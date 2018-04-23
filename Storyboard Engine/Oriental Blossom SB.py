@@ -2,6 +2,7 @@
 
 from Storyboard.StoryboardManager import *
 from tools.LyricsParser import *
+from Storyboard.Camera2D import *
 import random
 import math
 
@@ -19,7 +20,7 @@ import math
 
 # math.pi also works
 pi = 3.1415926
-song_folder = 'E:\\747823 Eisyo-kobu - Oriental Blossom'
+song_folder = 'F:\\osu!\\Songs\\747823 Eisyo-kobu - Oriental Blossom'
 sb_filename = 'Eisyo-kobu - Oriental Blossom (Spectator).osb'
 difftoMapper = {
     'Cup': 3, 'Salad': 3, 'Platter': 3, 'Rain': 3, 'Oriental': 3,
@@ -28,7 +29,7 @@ difftoMapper = {
 }
 # text spacing
 spacing = 0
-
+camera = Camera2D()
 
 def Background():
     objs = []
@@ -617,6 +618,29 @@ def Blossom(start_t, end_t, pos_x, pos_y, r, filename='SB/sakura.png'):
         objs.append(sakura)
     return Scene(objs)
 
+def Umbrella():
+    objs = []
+    timings = [64673, 64840, 65007, 65173, 65257, 65340, 65507, 65673, 65840, 65923]
+    pos = [[320, 240],
+           [160, 240],
+           [0, 240],
+           [160, 80],
+           [160, 400],
+           [160, 560],
+           [0, 560],
+           [320, 560],
+           [320, 720],
+           [320, 880]]
+    for i in range(len(timings)):
+        umbrella = Object('SB/umbrella.png', x=pos[i][0], y=pos[i][1])
+        umbrella.Fade(timings[i] - 100, timings[i], 0, 1)
+        umbrella.Scale(0.6)
+        objs.append(umbrella)
+        if i>0 :
+            camera.Move(9, timings[i-1], timings[i], pos[i-1], pos[i])
+
+    return Scene(objs)
+
 
 def beginning():
     objs = []
@@ -698,6 +722,11 @@ lanterns = LanternEffect()
 torlis = CrossTorli()
 ending = Ending()
 endingblack = EndingBlack()
+umbrellas = Umbrella()
+umbrellas.Fade(65673, 66007, 1, 0)
+camera.Scale(64007, 66007, 2)
+camera.Rotate(2, 64673, 66007, 0, -math.pi)
+umbrellas.set_camera(camera)
 
 # create subtitles for each diff
 title = generateTitle(subtitles)
@@ -744,6 +773,7 @@ w.Vector(854, 480)
 w.Fade(66007 - 400, 66007, 0.6, 0)
 scene = Scene([w])
 SBManager.append_scene(scene)
+SBManager.append_scene(umbrellas)
 
 for diff_name in SBManager.get_diff_names():
     SBManager.append_scene(bg, diff_name)

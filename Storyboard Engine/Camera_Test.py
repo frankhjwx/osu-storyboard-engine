@@ -37,7 +37,7 @@ def Scene1():
 
 SBManager = StoryboardManager('F:\osu!\Songs\Efude to kibou no uta', '123.osb')
 camera = Camera2D()
-camera.Move(1000, 2400, 320, 240, 320, 240)
+camera.Move(1000, 2400, 320, 240, 100, 100)
 camera.Rotate(2, 1000, 2400, 0, math.pi)
 camera.Scale(2, 1000, 2400, 1, 5)
 s = Scene1()
