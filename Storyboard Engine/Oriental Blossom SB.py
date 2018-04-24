@@ -723,9 +723,11 @@ torlis = CrossTorli()
 ending = Ending()
 endingblack = EndingBlack()
 umbrellas = Umbrella()
-umbrellas.Fade(65673, 66007, 1, 0)
+umbrellas.Fade(7, 66007, 66673, 1, 0)
 camera.Scale(64007, 66007, 2)
+camera.Scale(7, 66007, 66673, 2, 7)
 camera.Rotate(2, 64673, 66007, 0, -math.pi)
+camera.Rotate(7, 66007, 66673, -math.pi, -3*math.pi)
 umbrellas.set_camera(camera)
 
 # create subtitles for each diff
