@@ -111,17 +111,11 @@ class Scene:
                     cam_rotation = self.camera.get_rotation(t)
                     # change coordinate system
                     obj_pos = [obj_pos[0] - cam_pos[0], obj_pos[1] - cam_pos[1]]
-                    #cam_pos = [cam_pos[0] - 320, cam_pos[1] - 240]
-                    rotate = np.array([[math.cos(cam_rotation), math.sin(cam_rotation), 0],
-                                       [-math.sin(cam_rotation), math.cos(cam_rotation), 0],
-                                       [0, 0, 1]])
-                    transition = np.array([[1, 0, 0],
-                                           [0, 1, 0],
-                                           [0, 0, 1]])
-                    scale = np.array([[cam_scale, 0, 0],
-                                      [0, cam_scale, 0],
-                                      [0, 0, 1]])
-                    view_pos = np.dot(np.array([obj_pos[0], obj_pos[1], 1]), (np.dot(rotate, np.dot(transition, scale))))
+                    rotate = np.array([[math.cos(cam_rotation), math.sin(cam_rotation)],
+                                       [-math.sin(cam_rotation), math.cos(cam_rotation)]])
+                    scale = np.array([[cam_scale, 0],
+                                      [0, cam_scale]])
+                    view_pos = np.dot(np.array([obj_pos[0], obj_pos[1]]), (np.dot(rotate, scale)))
                     # return to the original system
                     view_pos = [view_pos[0] + 320, view_pos[1] + 240]
 

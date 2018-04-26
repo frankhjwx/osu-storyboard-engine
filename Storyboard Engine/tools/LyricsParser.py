@@ -149,9 +149,9 @@ class LyricParser:
 if __name__ == '__main__':
     # Create a characterRenderer first
     # Then create lyricParser, or directly add sentences
-    CR = CharacterRenderer(font_path='Fonts/LEVIBRUSH.TTF', file_path='SB/letters/')
+    CR = CharacterRenderer(font_path='..\\Fonts\\LEVIBRUSH.TTF', file_path='SB/letters/')
     LP = LyricParser(CR)
-    LP.ass_reader('Subtitles\hana ni natta.ass')
+    LP.ass_reader('..\\Subtitles\hana ni natta.ass')
     sentences = LP.get_sentences()
     #sentences.append(Sentence('麻花牛逼', 500, 1000, CR))
     #sentences.append(Sentence('yf大师牛逼', '00:50:123', '01:12:123', CR))
