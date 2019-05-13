@@ -11,6 +11,7 @@ class Letter:
         self.start_t = t1
         self.end_t = t2
         self.width = 0
+        self.height = 0
         self.filename = ''
 
 
@@ -21,6 +22,7 @@ class CharacterRenderer:
     def __init__(self, font_path="C:/Windows/Fonts/A-OTF-GothicBBBPr5-Medium.otf", font_size=60, file_path="SB/lyrics"):
         self.characters = []
         self.width = []
+        self.height = []
         self.font_path = font_path
         self.font_size = font_size
         self.file_path = file_path
@@ -32,12 +34,15 @@ class CharacterRenderer:
             self.characters.append(letter.character)
             #self.ch_render(len(self.characters)-1)
             self.width.append(self.font.size(letter.character)[0])
+            self.height.append(self.font.size(letter.character)[1])
             letter.width = self.width[len(self.characters)-1]
+            letter.height = self.height[len(self.characters)-1]
             letter.filename = self.id_to_filename(len(self.characters)-1)
             letter.index = len(self.characters)-1
         else:
             letter.id = self.characters.index(letter.character)
             letter.width = self.width[letter.id]
+            letter.height = self.height[letter.id]
             letter.filename = self.id_to_filename(letter.id)
         return
 
@@ -51,6 +56,7 @@ class CharacterRenderer:
     def render(self):
         if not os.path.exists(self.file_path):
             os.makedirs(self.file_path)
+        print(self.file_path)
         for i in range(len(self.characters)):
             self.ch_render(i)
 
@@ -62,14 +68,17 @@ class CharacterRenderer:
         else:
             name = str(self.characters.index(character))
         self.width.append(r_text.get_size()[0])
+        self.height.append(r_text.get_size()[1])
         pygame.image.save(r_text, os.path.join(self.file_path, name+".png"))
 
 
 class Sentence:
     def __init__(self, content='', start_t=normalize_timing_format(0), end_t=normalize_timing_format(0),
-                 character_renderer=None):
+                 character_renderer=None, tag="", artist=""):
         self.letters = []
         self.content = content
+        self.tag = tag
+        self.artist = artist
         self.start_t = normalize_timing_format(start_t)
         self.end_t = normalize_timing_format(end_t)
         if content != '':
@@ -109,14 +118,15 @@ class LyricParser:
         for line in file:
             if 'Dialogue:' in line:
                 args = line.split(',')
+
                 if '{\\k' not in line:
                     t1 = self.timing_parser(args[1])
                     t2 = self.timing_parser(args[2])
-                    self.sentences.append(Sentence(args[9][:-1], t1, t2, self.CR))
+                    self.sentences.append(Sentence(args[9][:-1], t1, t2, self.CR, tag=args[3], artist=args[4]))
                     continue
                 t1 = self.timing_parser(args[1])
                 t2 = self.timing_parser(args[2])
-                current_s = Sentence('', t1, t2)
+                current_s = Sentence('', t1, t2, tag=args[3], artist=args[4])
                 characters = args[9].split('{\\k')
                 current_t = t1
                 for character in characters:
@@ -149,9 +159,9 @@ class LyricParser:
 if __name__ == '__main__':
     # Create a characterRenderer first
     # Then create lyricParser, or directly add sentences
-    CR = CharacterRenderer(font_path='Fonts/LEVIBRUSH.TTF', file_path='SB/letters/')
+    CR = CharacterRenderer(font_path='..\\Fonts\\LEVIBRUSH.TTF', file_path='SB/letters/')
     LP = LyricParser(CR)
-    LP.ass_reader('Subtitles\hana ni natta.ass')
+    LP.ass_reader('..\\Subtitles\hana ni natta.ass')
     sentences = LP.get_sentences()
     #sentences.append(Sentence('麻花牛逼', 500, 1000, CR))
     #sentences.append(Sentence('yf大师牛逼', '00:50:123', '01:12:123', CR))

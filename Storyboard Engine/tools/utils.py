@@ -1,5 +1,6 @@
 import shutil
-
+import re
+import copy
 
 def time_parser(s):
     args = s.split(':')

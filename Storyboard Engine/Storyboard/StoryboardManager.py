@@ -51,7 +51,8 @@ class StoryboardManager:
         if self.restore:
             return
         storyboard_file_header = self.get_storyboard_file_header()
-        diff_specific_headers = self.get_osu_file_headers()
+        if diff_specific:
+            diff_specific_headers = self.get_osu_file_headers()
         for i in range(len(self.scenes)):
             if self.scene_file_headers[i] == '':
                 self.scenes[i].print_scene()
@@ -142,12 +143,16 @@ class StoryboardManager:
                     diff_paths.append(os.path.join(dir_path, fn))
         for path in diff_paths:
             f = open(path, 'r', encoding='utf-8', errors='ignore')
+            diff_name = ""
             while 1:
                 line = f.readline()
                 if not line:
                     break
                 if 'Version:' in line:
                     diff_name = line.split(':')[1][:-1]
+            # null osu files maybe
+            if diff_name == "":
+                continue
             headers[diff_name] = open(path, 'w', encoding='utf-8', errors='ignore')
         return headers
 
