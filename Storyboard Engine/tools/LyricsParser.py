@@ -53,14 +53,21 @@ class CharacterRenderer:
             name = self.file_path + str(id) + '.png'
         return '"'+name+'"'
 
-    def render(self):
-        if not os.path.exists(self.file_path):
-            os.makedirs(self.file_path)
-        print(self.file_path)
+    def render(self, path = ""):
+        if path == "":
+            outputpath = self.file_path
+        else:
+            outputpath = path
+        if not os.path.exists(outputpath):
+            os.makedirs(outputpath)
         for i in range(len(self.characters)):
-            self.ch_render(i)
+            self.ch_render(i, path=outputpath)
 
-    def ch_render(self, index):
+    def ch_render(self, index, path = ""):
+        if path == "":
+            outputpath = self.file_path
+        else:
+            outputpath = path
         character = self.characters[index]
         r_text = self.font.render(character, True, (255, 255, 255))
         if self.characters.index(character)%10 == 0:
@@ -69,7 +76,7 @@ class CharacterRenderer:
             name = str(self.characters.index(character))
         self.width.append(r_text.get_size()[0])
         self.height.append(r_text.get_size()[1])
-        pygame.image.save(r_text, os.path.join(self.file_path, name+".png"))
+        pygame.image.save(r_text, os.path.join(outputpath, name+".png"))
 
 
 class Sentence:

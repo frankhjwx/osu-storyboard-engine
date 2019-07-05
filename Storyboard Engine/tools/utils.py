@@ -3,6 +3,8 @@ import re
 import copy
 
 def time_parser(s):
+    if type(s) != type("str"):
+        return s
     args = s.split(':')
     m = int(args[0])
     s = int(args[1])
